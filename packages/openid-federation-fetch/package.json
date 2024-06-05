@@ -1,0 +1,14 @@
+{
+  "name": "@animo-id/openid-federation-fetch",
+  "version": "0.1.0",
+  "description": "The fetch implementation that is being used for the OpenID Federation",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Animo Solutions",
+  "devDependencies": {
+    "typescript": "*"
+  }
+}

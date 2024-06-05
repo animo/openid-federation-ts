@@ -1,0 +1,14 @@
+{
+  "name": "@animo-id/openid-federation-registry",
+  "version": "0.1.0",
+  "description": "This will contain the registry builder for OpenID Federation",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Animo Solutions",
+  "devDependencies": {
+    "typescript": "*"
+  }
+}

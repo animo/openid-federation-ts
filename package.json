@@ -1,0 +1,29 @@
+{
+  "name": "openid-federation-ts",
+  "version": "0.1.0",
+  "description": "",
+  "main": "src/index.ts",
+  "keywords": [],
+  "author": "Animo Solutions",
+  "license": "(MIT OR Apache-2.0)",
+  "scripts": {
+    "clean": "rm -rf **/build",
+    "clean:deps": "pnpm clean && rm -rf node_modules",
+    "build": "pnpm -r build",
+    "biome": "biome",
+    "check-format": "pnpm biome check .",
+    "check-format:ci": "pnpm biome ci .",
+    "check-types": "pnpm build --noEmit",
+    "format": "pnpm check-format --write",
+    "test": "pnpm -r test",
+    "release": "lerna publish --pre-dist-tag alpha"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.8.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "typescript": "~5.3.2"
+    }
+  }
+}
