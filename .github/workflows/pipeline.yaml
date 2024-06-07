@@ -83,7 +83,7 @@ jobs:
                   git config --global user.name "Animo Development"
 
                   if [ ${{ inputs.release-type }} == 'alpha' ]; then
-                    pnpm release prerelease --yes
+                    pnpm release --pre-dist-tag alpha prerelease --yes
                   else
                     pnpm release ${{ inputs.release-type }} --force-publish --no-private --yes
                   fi
