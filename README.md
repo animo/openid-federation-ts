@@ -6,7 +6,7 @@
   </picture>
 </p>
 
-<h1 align="center" ><b>Animo TypeScript Template</b></h1>
+<h1 align="center" ><b>OpenID Federation</b></h1>
 
 <h4 align="center">Powered by &nbsp; 
   <picture>
