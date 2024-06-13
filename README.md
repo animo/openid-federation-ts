@@ -47,12 +47,12 @@ All packages are placed in the [`packages/`](./packages) directory.
 
 | Package                                                             | Version | Description                        |
 | ------------------------------------------------------------------- | ------- | ---------------------------------- |
-| [`openid-federation-fetch`](./packages/openid-federation-fetch)                 | 0.1.0   | Fetch implementation which is used to fetch the OpenID Federation. |
-| [`openid-federation-policies`](./packages/openid-federation-policies) | 0.1.0   | Policies for OpenID Federation shared. |
-| [`openid-federation-registry`](./packages/openid-federation-registry) | 0.1.0   | Implementation of the registry for OpenID Federation. |
-| [`openid-federation-registry-policies`](./packages/openid-federation-registry-policies) | 0.1.0   | Policies for the registry for OpenID Federation. |
-| [`openid-federation-resolver`](./packages/openid-federation-resolver) | 0.1.0   | Resolver implementation for OpenID Federation. |
-| [`openid-federation-resolver-policies`](./packages/openid-federation-resolver-policies) | 0.1.0   | Policies for the resolver for OpenID Federation. |
+| [`@openid-federation/fetch`](./packages/openid-federation-fetch)                 | 0.1.0   | Fetch implementation which is used to fetch the OpenID Federation. |
+| [`@openid-federation/policies`](./packages/openid-federation-policies) | 0.1.0   | Policies for OpenID Federation shared. |
+| [`@openid-federation/registry`](./packages/openid-federation-registry) | 0.1.0   | Implementation of the registry for OpenID Federation. |
+| [`@openid-federation/registry-policies`](./packages/openid-federation-registry-policies) | 0.1.0   | Policies for the registry for OpenID Federation. |
+| [`@openid-federation/resolver`](./packages/openid-federation-resolver) | 0.1.0   | Resolver implementation for OpenID Federation. |
+| [`@openid-federation/resolver-policies`](./packages/openid-federation-resolver-policies) | 0.1.0   | Policies for the resolver for OpenID Federation. |
 
 
 
