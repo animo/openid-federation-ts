@@ -1,0 +1,18 @@
+{
+  "name": "@animo-id/openid-federation-policies",
+  "version": "0.1.0",
+  "private": true,
+  "description": "This will contain the common policies for the OpenID Federation",
+  "main": "src/index.ts",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "node --import tsx --test **/__tests__/**/*.test.ts"
+  },
+  "keywords": [],
+  "author": "Animo Solutions",
+  "devDependencies": {
+    "typescript": "*",
+    "@types/node": "*",
+    "tsx": "*"
+  }
+}

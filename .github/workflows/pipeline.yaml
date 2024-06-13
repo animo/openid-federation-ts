@@ -1,0 +1,103 @@
+name: 'Pipeline'
+
+on:
+    push:
+        branches: [main]
+
+    pull_request:
+        types: [opened, synchronize]
+
+    workflow_dispatch:
+        inputs:
+        # TODO: Look into https://github.com/changesets/changesets
+            release-type:
+                description: 'Type of release (major, minor, patch, alpha)'
+                required: true
+                default: alpha
+                type: choice
+                options:
+                    - major
+                    - minor
+                    - patch
+                    - alpha
+
+jobs:
+    continous-integration:
+        name: 'Continuous Integration'
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: 9.1.0
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Check formatting
+              run: pnpm check-format:ci
+
+            - name: Build
+              run: pnpm build
+
+            - name: Check types
+              run: pnpm check-types
+
+            # TODO: In pnpm the tests are failing when there is not a node_modules present in the package. Haven't found a fix for it yet.
+            # - name: Test
+            #   run: pnpm test
+
+    continious-deployment:
+        if: github.event_name == 'workflow_dispatch'
+
+        name: 'Continous Deployment'
+        runs-on: ubuntu-latest
+        needs: ['continous-integration']
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: 9.1.0
+
+            - name: Install dependencies
+              run: pnpm i
+
+            - name: Build
+              run: pnpm build
+
+            - name: Initialise the NPM config
+              env:
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+              run: npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+
+            - name: Publish
+              id: publish
+              env:
+                  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+              run: |
+                  echo ${{ inputs.release-type }}
+                  git config --global user.email "development@animo.id"
+                  git config --global user.name "Animo Development"
+
+                  if [ ${{ inputs.release-type }} == 'alpha' ]; then
+                    pnpm release --pre-dist-tag alpha prerelease --yes
+                  else
+                    pnpm release ${{ inputs.release-type }} --force-publish --no-private --yes
+                  fi
+
+                  version=$(node -p "require('./lerna.json').version")
+                  echo "LERNA_VERSION=$version" >> "$GITHUB_OUTPUT"
+
+            - name: Create Github Release
+              uses: softprops/action-gh-release@v1
+              with:
+                  generate_release_notes: true
+                  prerelease: ${{ inputs.release-type == 'alpha' }}
+                  token: ${{ secrets.GH_TOKEN }}
+                  tag_name: v${{ steps.publish.outputs.LERNA_VERSION }}
+                  name: Release v${{ steps.publish.outputs.LERNA_VERSION }}
