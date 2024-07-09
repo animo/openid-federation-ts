@@ -9,7 +9,7 @@ export const oneOfOperator: MetadataOperator = {
   parameterJsonValues: [z.string(), z.record(z.string().or(z.number()), z.unknown()), z.number()],
   operatorJsonValues: [
     z.array(z.string()),
-    z.array(z.record(z.string().or(z.number())), z.unknown()),
+    z.array(z.record(z.string().or(z.number()), z.unknown())),
     z.array(z.number()),
   ],
   canBeCombinedWith: ['default', 'essential'],

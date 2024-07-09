@@ -14,6 +14,6 @@ export const createEntity = ({
   return {
     identifier,
     schema,
-    policySchema: swapValidators(schema, metadataPolicySchema),
+    policySchema: swapValidators(schema, metadataPolicySchema.optional()),
   }
 }

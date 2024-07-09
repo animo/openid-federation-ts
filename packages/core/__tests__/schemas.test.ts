@@ -10,6 +10,7 @@ import { trustMarkIssuerSchema } from '../src/trustMark'
 import { trustMarkOwnerSchema } from '../src/trustMark'
 
 import { federationEntityMetadata } from '../src/metadata'
+import { metadataPolicySchema } from '../src/metadata/metadataPolicy'
 import { constraintsFigure17 } from './fixtures/constraintsFigure17'
 import { entityConfigurationFigure8 } from './fixtures/entityConfigurationFigure8'
 import { entityConfigurationFigure9 } from './fixtures/entityConfigurationFigure9'
@@ -28,6 +29,7 @@ import { entityStatementFigure62 } from './fixtures/entityStatementFigure62'
 import { entityStatementFigure70 } from './fixtures/entityStatementFigure70'
 import { federationEntityMetadataFigure7 } from './fixtures/federationEntityMetadataFigure7'
 import { metadataFigure63 } from './fixtures/metadataFigure63'
+import { metadataPolicyFigure12 } from './fixtures/metadataPolicyFigure12'
 import { trustMarkClaimsFigure19 } from './fixtures/trustMarkClaimsFigure19'
 import { trustMarkClaimsFigure21 } from './fixtures/trustMarkClaimsFigure21'
 import { trustMarkClaimsFigure22 } from './fixtures/trustMarkClaimsFigure22'
@@ -61,6 +63,10 @@ describe('zod validation schemas', () => {
 
     it('should validate figure 9 -- entity configuration', () => {
       assert.doesNotThrow(() => entityConfigurationSchema.parse(entityConfigurationFigure9))
+    })
+
+    it('should validate figure 12 -- metadata policy', () => {
+      assert.doesNotThrow(() => metadataPolicySchema.parse(metadataPolicyFigure12))
     })
 
     it('should validate figure 17 -- constraints', () => {
