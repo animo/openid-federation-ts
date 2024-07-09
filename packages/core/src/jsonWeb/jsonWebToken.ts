@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer'
-import { type ZodSchema, z } from 'zod'
+import { z } from 'zod'
 
 const defaultSchema = z.record(z.string().or(z.number()), z.unknown())
 
@@ -8,22 +8,33 @@ const defaultSchema = z.record(z.string().or(z.number()), z.unknown())
  * @todo better jwt validation
  *
  */
-export const jsonWebTokenSchema = (
+export const jsonWebTokenSchema = <
+  CS extends z.ZodSchema = typeof defaultSchema,
+  HS extends z.ZodSchema = typeof defaultSchema,
+>(
   {
-    claimsSchema = defaultSchema,
-    headerSchema = defaultSchema,
+    claimsSchema = defaultSchema as unknown as CS,
+    headerSchema = defaultSchema as unknown as HS,
   }: {
-    claimsSchema?: ZodSchema
-    headerSchema?: ZodSchema
-  } = { claimsSchema: defaultSchema, headerSchema: defaultSchema }
+    claimsSchema?: CS
+    headerSchema?: HS
+  } = {
+    claimsSchema: defaultSchema as unknown as CS,
+    headerSchema: defaultSchema as unknown as HS,
+  }
 ) =>
-  z.string().refine((s) => {
-    const [header, claims] = s.split('.')
+  z.string().transform((s) => {
+    const [header, claims, signature] = s.split('.')
     const decodedHeader = Buffer.from(header, 'base64url').toString()
     const decodedClaims = Buffer.from(claims, 'base64url').toString()
+    const decodedSignature = Buffer.from(signature, 'base64url')
 
-    const validatedHeader = headerSchema.parse(JSON.parse(decodedHeader))
-    const validatedClaims = claimsSchema.parse(JSON.parse(decodedClaims))
+    const validatedHeader = headerSchema.parse(JSON.parse(decodedHeader)) as z.infer<HS>
+    const validatedClaims = claimsSchema.parse(JSON.parse(decodedClaims)) as z.infer<CS>
 
-    return { header: validatedHeader, claims: validatedClaims }
+    return {
+      header: validatedHeader,
+      claims: validatedClaims,
+      signature: new Uint8Array(decodedSignature),
+    }
   })
