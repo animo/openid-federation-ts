@@ -11,3 +11,5 @@ export const jsonWebKeySchema = z.object({
   x5t: z.string().optional(),
   'x5t#S256': z.string().optional(),
 })
+
+export type JsonWebKey = z.input<typeof jsonWebKeySchema>

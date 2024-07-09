@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
 import { constraintSchema } from '../src/constraints'
-import { entityConfigurationSchema } from '../src/entityConfiguration'
+import { entityConfigurationClaimsSchema } from '../src/entityConfiguration'
 import { entityStatementClaimsSchema } from '../src/entityStatement'
 import { metadataSchema } from '../src/metadata/metadata'
 import { trustMarkClaimsSchema } from '../src/trustMark'
@@ -41,28 +41,28 @@ import { trustMarkClaimsFigure20 } from './fixtures/trustmarkClaimsFigure20'
 
 describe('zod validation schemas', () => {
   describe('validate valid test vectors', () => {
-    it('should validate figure 2 -- entity statement', () => {
+    it('should validate figure 2  -- entity statement', () => {
       assert.doesNotThrow(() => entityStatementClaimsSchema.parse(entityStatementFigure2))
     })
 
-    it('should validate figure 3 -- trust mark owners', () => {
+    it('should validate figure 3  -- trust mark owners', () => {
       assert.doesNotThrow(() => trustMarkOwnerSchema.parse(trustMarkOwnersFigure3))
     })
 
-    it('should validate figure 4 -- trust mark issuers', () => {
+    it('should validate figure 4  -- trust mark issuers', () => {
       assert.doesNotThrow(() => trustMarkIssuerSchema.parse(trustMarkIssuersFigure4))
     })
 
-    it('should validate figure 7 -- federation entity metadata', () => {
+    it('should validate figure 7  -- federation entity metadata', () => {
       assert.doesNotThrow(() => federationEntityMetadata.schema.parse(federationEntityMetadataFigure7))
     })
 
-    it('should validate figure 8 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationSchema.parse(entityConfigurationFigure8))
+    it('should validate figure 8  -- entity configuration', () => {
+      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure8))
     })
 
-    it('should validate figure 9 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationSchema.parse(entityConfigurationFigure9))
+    it('should validate figure 9  -- entity configuration', () => {
+      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure9))
     })
 
     it('should validate figure 12 -- metadata policy', () => {
@@ -74,7 +74,7 @@ describe('zod validation schemas', () => {
     })
 
     it('should validate figure 18 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationSchema.parse(entityConfigurationFigure18))
+      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure18))
     })
 
     it('should validate figure 19 -- trust mark claims', () => {
@@ -106,15 +106,15 @@ describe('zod validation schemas', () => {
     })
 
     it('should validate figure 43 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationSchema.parse(entityConfigurationFigure43))
+      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure43))
     })
 
     it('should validate figure 50 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationSchema.parse(entityConfigurationFigure50))
+      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure50))
     })
 
     it('should validate figure 52 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationSchema.parse(entityConfigurationFigure52))
+      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure52))
     })
 
     it('should validate figure 54 -- entity statement', () => {
@@ -122,7 +122,7 @@ describe('zod validation schemas', () => {
     })
 
     it('should validate figure 56 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationSchema.parse(entityConfigurationFigure56))
+      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure56))
     })
 
     it('should validate figure 58 -- entity statement', () => {
@@ -130,7 +130,7 @@ describe('zod validation schemas', () => {
     })
 
     it('should validate figure 60 -- entity configutation', () => {
-      assert.doesNotThrow(() => entityConfigurationSchema.parse(entityConfigurationFigure60))
+      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure60))
     })
 
     it('should validate figure 62 -- entity statement', () => {
@@ -142,7 +142,7 @@ describe('zod validation schemas', () => {
     })
 
     it('should validate figure 69 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationSchema.parse(entityConfigurationFigure69))
+      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure69))
     })
 
     it('should validate figure 70 -- entity statement', () => {
