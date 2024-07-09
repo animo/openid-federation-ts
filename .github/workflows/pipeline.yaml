@@ -37,17 +37,16 @@ jobs:
               run: pnpm install
 
             - name: Check formatting
-              run: pnpm check-format:ci
+              run: pnpm check:style
 
             - name: Build
               run: pnpm build
 
             - name: Check types
-              run: pnpm check-types
+              run: pnpm check:types
 
-            # TODO: In pnpm the tests are failing when there is not a node_modules present in the package. Haven't found a fix for it yet.
-            # - name: Test
-            #   run: pnpm test
+            - name: Test
+              run: pnpm test
 
     continious-deployment:
         if: github.event_name == 'workflow_dispatch'

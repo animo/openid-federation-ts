@@ -1,0 +1,18 @@
+export const metadataFigure63 = {
+  authorization_endpoint: 'https://op.umu.se/openid/authorization',
+  contacts: ['ops@swamid.se', 'ops@edugain.geant.org'],
+  federation_registration_endpoint: 'https://op.umu.se/openid/fedreg',
+  client_registration_types_supported: ['automatic', 'explicit'],
+  grant_types_supported: ['authorization_code', 'implicit', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+  id_token_signing_alg_values_supported: ['RS256', 'ES256'],
+  issuer: 'https://op.umu.se/openid',
+  signed_jwks_uri: 'https://op.umu.se/openid/jwks.jose',
+  logo_uri: 'https://www.umu.se/img/umu-logo-left-neg-SE.svg',
+  organization_name: 'University of Umeå',
+  op_policy_uri: 'https://www.umu.se/en/website/legal-information/',
+  request_parameter_supported: true,
+  response_types_supported: ['code', 'code id_token', 'token'],
+  subject_types_supported: ['pairwise'],
+  token_endpoint: 'https://op.umu.se/openid/token',
+  token_endpoint_auth_methods_supported: ['private_key_jwt', 'client_secret_jwt'],
+}

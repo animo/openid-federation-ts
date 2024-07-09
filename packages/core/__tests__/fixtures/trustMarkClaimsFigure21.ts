@@ -1,0 +1,15 @@
+export const trustMarkClaimsFigure21 = {
+  id: 'https://mushrooms.federation.example.com/arrosto/agreements',
+  iss: 'https://agaricaceae.example.it',
+  sub: 'https://coppolino.example.com',
+  iat: 1579621160,
+  logo_uri: 'https://coppolino.example.com/sgd-cmyk-150dpi-90mm.svg',
+  organization_type: 'public',
+  id_code: '123456',
+  email: 'info@coppolino.example.com',
+  'organization_name#it': 'Mazza di Tamburo',
+  'policy_uri#it': 'https://coppolino.example.com/privacy_policy',
+  'tos_uri#it': 'https://coppolino.example.com/info_policy',
+  service_documentation: 'https://coppolino.example.com/api/v1/get/services',
+  ref: 'https://agaricaceae.example.it/documentation/agaricaceae.pdf',
+}

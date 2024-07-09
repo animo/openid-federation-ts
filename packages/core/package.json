@@ -1,0 +1,22 @@
+{
+  "name": "@openid-federation/core",
+  "version": "0.1.0",
+  "description": "Core types and functionality of openid federation",
+  "license": "Apache-2.0",
+  "main": "src/index.ts",
+  "keywords": [],
+  "author": "Animo Solutions",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --require ts-node/register --test __tests__/*.test.ts"
+  },
+  "dependencies": {
+    "buffer": "^6.0.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "*",
+    "ts-node": "*",
+    "typescript": "*"
+  }
+}
