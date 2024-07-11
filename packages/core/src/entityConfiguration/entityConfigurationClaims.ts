@@ -6,8 +6,6 @@ export const entityConfigurationClaimsSchema = entityStatementClaimsSchema.refin
   path: ['iss', 'sub'],
 })
 
-type EntityConfigurationClaimsInput = z.input<typeof entityConfigurationClaimsSchema>
+export type EntityConfigurationClaimsOptions = z.input<typeof entityConfigurationClaimsSchema>
 
-type EntityConfigurationClaimsOutput = z.output<typeof entityConfigurationClaimsSchema>
-
-export type EntityConfigurationClaims = EntityConfigurationClaimsInput | EntityConfigurationClaimsOutput
+export type EntityConfigurationClaims = z.output<typeof entityConfigurationClaimsSchema>

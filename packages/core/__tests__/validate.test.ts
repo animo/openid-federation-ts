@@ -11,6 +11,7 @@ import { trustMarkOwnerSchema } from '../src/trustMark'
 
 import { federationEntityMetadata } from '../src/metadata'
 import { metadataPolicySchema } from '../src/metadata/metadataPolicy'
+import { validate } from '../src/utils/validate'
 import { constraintsFigure17 } from './fixtures/constraintsFigure17'
 import { entityConfigurationFigure8 } from './fixtures/entityConfigurationFigure8'
 import { entityConfigurationFigure9 } from './fixtures/entityConfigurationFigure9'
@@ -42,111 +43,226 @@ import { trustMarkClaimsFigure20 } from './fixtures/trustmarkClaimsFigure20'
 describe('zod validation schemas', () => {
   describe('validate valid test vectors', () => {
     it('should validate figure 2  -- entity statement', () => {
-      assert.doesNotThrow(() => entityStatementClaimsSchema.parse(entityStatementFigure2))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityStatementClaimsSchema,
+          data: entityStatementFigure2,
+        })
+      )
     })
 
     it('should validate figure 3  -- trust mark owners', () => {
-      assert.doesNotThrow(() => trustMarkOwnerSchema.parse(trustMarkOwnersFigure3))
+      assert.doesNotThrow(() => validate({ schema: trustMarkOwnerSchema, data: trustMarkOwnersFigure3 }))
     })
 
     it('should validate figure 4  -- trust mark issuers', () => {
-      assert.doesNotThrow(() => trustMarkIssuerSchema.parse(trustMarkIssuersFigure4))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: trustMarkIssuerSchema,
+          data: trustMarkIssuersFigure4,
+        })
+      )
     })
 
     it('should validate figure 7  -- federation entity metadata', () => {
-      assert.doesNotThrow(() => federationEntityMetadata.schema.parse(federationEntityMetadataFigure7))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: federationEntityMetadata.schema,
+          data: federationEntityMetadataFigure7,
+        })
+      )
     })
 
     it('should validate figure 8  -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure8))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityConfigurationClaimsSchema,
+          data: entityConfigurationFigure8,
+        })
+      )
     })
 
     it('should validate figure 9  -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure9))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityConfigurationClaimsSchema,
+          data: entityConfigurationFigure9,
+        })
+      )
     })
 
     it('should validate figure 12 -- metadata policy', () => {
-      assert.doesNotThrow(() => metadataPolicySchema.parse(metadataPolicyFigure12))
+      assert.doesNotThrow(() => validate({ schema: metadataPolicySchema, data: metadataPolicyFigure12 }))
     })
 
     it('should validate figure 17 -- constraints', () => {
-      assert.doesNotThrow(() => constraintSchema.parse(constraintsFigure17))
+      assert.doesNotThrow(() => validate({ schema: constraintSchema, data: constraintsFigure17 }))
     })
 
     it('should validate figure 18 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure18))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityConfigurationClaimsSchema,
+          data: entityConfigurationFigure18,
+        })
+      )
     })
 
     it('should validate figure 19 -- trust mark claims', () => {
-      assert.doesNotThrow(() => trustMarkClaimsSchema.parse(trustMarkClaimsFigure19))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: trustMarkClaimsSchema,
+          data: trustMarkClaimsFigure19,
+        })
+      )
     })
 
     it('should validate figure 20 -- trust mark claims', () => {
-      assert.doesNotThrow(() => trustMarkClaimsSchema.parse(trustMarkClaimsFigure20))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: trustMarkClaimsSchema,
+          data: trustMarkClaimsFigure20,
+        })
+      )
     })
 
     it('should validate figure 21 -- trust mark claims', () => {
-      assert.doesNotThrow(() => trustMarkClaimsSchema.parse(trustMarkClaimsFigure21))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: trustMarkClaimsSchema,
+          data: trustMarkClaimsFigure21,
+        })
+      )
     })
 
     it('should validate figure 22 -- trust mark claims', () => {
-      assert.doesNotThrow(() => trustMarkClaimsSchema.parse(trustMarkClaimsFigure22))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: trustMarkClaimsSchema,
+          data: trustMarkClaimsFigure22,
+        })
+      )
     })
 
     it('should validate figure 23 -- trust mark claims', () => {
-      assert.doesNotThrow(() => trustMarkClaimsSchema.parse(trustMarkClaimsFigure23))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: trustMarkClaimsSchema,
+          data: trustMarkClaimsFigure23,
+        })
+      )
     })
 
     it('should validate figure 24 -- trust mark claims', () => {
-      assert.doesNotThrow(() => trustMarkClaimsSchema.parse(trustMarkClaimsFigure24))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: trustMarkClaimsSchema,
+          data: trustMarkClaimsFigure24,
+        })
+      )
     })
 
     it('should validate figure 26 -- entity statement', () => {
-      assert.doesNotThrow(() => entityStatementClaimsSchema.parse(entityStatementFigure26))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityStatementClaimsSchema,
+          data: entityStatementFigure26,
+        })
+      )
     })
 
     it('should validate figure 43 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure43))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityConfigurationClaimsSchema,
+          data: entityConfigurationFigure43,
+        })
+      )
     })
 
     it('should validate figure 50 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure50))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityConfigurationClaimsSchema,
+          data: entityConfigurationFigure50,
+        })
+      )
     })
 
     it('should validate figure 52 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure52))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityConfigurationClaimsSchema,
+          data: entityConfigurationFigure52,
+        })
+      )
     })
 
     it('should validate figure 54 -- entity statement', () => {
-      assert.doesNotThrow(() => entityStatementClaimsSchema.parse(entityStatementFigure54))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityStatementClaimsSchema,
+          data: entityStatementFigure54,
+        })
+      )
     })
 
     it('should validate figure 56 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure56))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityConfigurationClaimsSchema,
+          data: entityConfigurationFigure56,
+        })
+      )
     })
 
     it('should validate figure 58 -- entity statement', () => {
-      assert.doesNotThrow(() => entityStatementClaimsSchema.parse(entityStatementFigure58))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityStatementClaimsSchema,
+          data: entityStatementFigure58,
+        })
+      )
     })
 
     it('should validate figure 60 -- entity configutation', () => {
-      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure60))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityConfigurationClaimsSchema,
+          data: entityConfigurationFigure60,
+        })
+      )
     })
 
     it('should validate figure 62 -- entity statement', () => {
-      assert.doesNotThrow(() => entityStatementClaimsSchema.parse(entityStatementFigure62))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityStatementClaimsSchema,
+          data: entityStatementFigure62,
+        })
+      )
     })
 
     it('should validate figure 63 -- metadata', () => {
-      assert.doesNotThrow(() => metadataSchema.parse(metadataFigure63))
+      assert.doesNotThrow(() => validate({ schema: metadataSchema, data: metadataFigure63 }))
     })
 
     it('should validate figure 69 -- entity configuration', () => {
-      assert.doesNotThrow(() => entityConfigurationClaimsSchema.parse(entityConfigurationFigure69))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityConfigurationClaimsSchema,
+          data: entityConfigurationFigure69,
+        })
+      )
     })
 
     it('should validate figure 70 -- entity statement', () => {
-      assert.doesNotThrow(() => entityStatementClaimsSchema.parse(entityStatementFigure70))
+      assert.doesNotThrow(() =>
+        validate({
+          schema: entityStatementClaimsSchema,
+          data: entityStatementFigure70,
+        })
+      )
     })
   })
 })

@@ -1,5 +1,6 @@
 import type { z } from 'zod'
 import { addSearchParams } from './url'
+import { validate } from './validate'
 
 const get = async <T extends z.ZodSchema>({
   url,
@@ -11,7 +12,7 @@ const get = async <T extends z.ZodSchema>({
   searchParams?: Record<string, string>
   responseValidationSchema?: T
   requiredContentType?: string
-}): Promise<typeof responseValidationSchema extends T ? z.infer<typeof responseValidationSchema> : string> => {
+}): Promise<typeof responseValidationSchema extends T ? z.output<T> : string> => {
   // Fetch the url with the search params
   const urlSearchParams = new URLSearchParams(searchParams)
   const urlWithSearchParams = addSearchParams(url, urlSearchParams)
@@ -31,7 +32,11 @@ const get = async <T extends z.ZodSchema>({
   // If we pass in a validation schema, we expect JSON output
   if (responseValidationSchema) {
     const json = await response.json()
-    return responseValidationSchema.parse(json)
+    return validate({
+      data: json,
+      schema: responseValidationSchema,
+      errorMessage: 'invalid response from the GET call',
+    })
   }
 
   // If no validation schema is passed in, we expect a string as response
@@ -61,7 +66,11 @@ const post = async ({
 
   if (responseValidationSchema) {
     const json = await response.json()
-    return responseValidationSchema.parse(json)
+    return validate({
+      data: json,
+      schema: responseValidationSchema,
+      errorMessage: 'invalid response from a POST call',
+    })
   }
 
   const text = await response.text()

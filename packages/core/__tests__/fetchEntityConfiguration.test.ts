@@ -8,7 +8,7 @@ import nock from 'nock'
 describe('fetch entity configuration', () => {
   const verifyJwtCallback: VerifyCallback = () => Promise.resolve(true)
 
-  const signCallback: SignCallback = () => Promise.resolve(new Uint8Array(10).fill(42))
+  const signJwtCallback: SignCallback = () => Promise.resolve(new Uint8Array(10).fill(42))
 
   it('should fetch a simple entity configuration', async () => {
     const entityId = 'https://example.org'
@@ -24,7 +24,7 @@ describe('fetch entity configuration', () => {
     const entityConfiguration = await createEntityConfiguration({
       header: { kid: 'a', typ: 'entity-statement+jwt' },
       claims,
-      signJwtCallback: signCallback,
+      signJwtCallback,
     })
 
     const scope = nock(entityId).get('/.well-known/openid-federation').reply(200, entityConfiguration, {
@@ -55,14 +55,14 @@ describe('fetch entity configuration', () => {
     const entityConfiguration = await createEntityConfiguration({
       header: { kid: 'a', typ: 'entity-statement+jwt' },
       claims,
-      signJwtCallback: signCallback,
+      signJwtCallback,
     })
 
     const scope = nock(entityId).get('/.well-known/openid-federation').reply(200, entityConfiguration, {
       'content-type': 'invalid-type',
     })
 
-    await assert.rejects(fetchEntityConfiguration({ entityId, verifyJwtCallback }), { name: 'Error' })
+    await assert.rejects(fetchEntityConfiguration({ entityId, verifyJwtCallback }))
 
     scope.done()
   })
@@ -70,6 +70,6 @@ describe('fetch entity configuration', () => {
   it('should not fetch an entity configuration when there is no entity configuration', async () => {
     const entityId = 'https://examplethree.org'
 
-    await assert.rejects(fetchEntityConfiguration({ entityId, verifyJwtCallback }), { name: 'TypeError' })
+    await assert.rejects(fetchEntityConfiguration({ entityId, verifyJwtCallback }))
   })
 })

@@ -1,32 +1,26 @@
 import type { VerifyCallback } from '../utils'
-import { createJwtSignableInput } from './createJsonWebTokenSignableInput'
 import { getUsedJsonWebKey } from './getUsedJsonWebKey'
+import type { JsonWebKeySet } from './jsonWebKeySet'
+import { parseJsonWebToken } from './parseJsonWebToken'
 
 type VerifyJsonWebTokenOptions = {
   verifyJwtCallback: VerifyCallback
-  header: Record<string, unknown>
-  claims: Record<string, unknown>
-  claimsThatContainTheKid?: Record<string, unknown>
-  signature: Uint8Array
+  jwks?: JsonWebKeySet
+  jwt: string
 }
 
-export const verifyJsonWebToken = async ({
-  claims,
-  claimsThatContainTheKid = claims,
-  header,
-  signature,
-  verifyJwtCallback,
-}: VerifyJsonWebTokenOptions) => {
-  const jwk = getUsedJsonWebKey(header, claimsThatContainTheKid)
+export const verifyJwtSignature = async ({ jwt, jwks, verifyJwtCallback }: VerifyJsonWebTokenOptions) => {
+  const { header, signature, claims, signableInput } = parseJsonWebToken(jwt)
 
-  // Create a byte array of the data to be verified
-  const toBeVerified = createJwtSignableInput(header, claims)
+  const jsonWebKeySetClaims = jwks ? { jwks } : claims
+
+  const jwk = getUsedJsonWebKey(header, jsonWebKeySetClaims)
 
   try {
     const isValid = await verifyJwtCallback({
       signature,
       jwk,
-      data: toBeVerified,
+      data: signableInput,
     })
 
     // TODO: better error message

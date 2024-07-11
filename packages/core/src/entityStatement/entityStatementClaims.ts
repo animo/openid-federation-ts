@@ -37,4 +37,6 @@ export const entityStatementClaimsSchema = z
     return data
   })
 
-export type EntityStatementClaims = z.input<typeof entityStatementClaimsSchema>
+export type EntityStatementClaimsOptions = z.input<typeof entityStatementClaimsSchema>
+
+export type EntityStatementClaims = z.output<typeof entityStatementClaimsSchema>

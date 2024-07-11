@@ -1,5 +1,6 @@
-import { Buffer } from 'node:buffer'
+import { Buffer } from 'buffer'
 import { z } from 'zod'
+import { validate } from '../utils/validate'
 
 const defaultSchema = z.record(z.string().or(z.number()), z.unknown())
 
@@ -29,8 +30,16 @@ export const jsonWebTokenSchema = <
     const decodedClaims = Buffer.from(claims, 'base64url').toString()
     const decodedSignature = Buffer.from(signature, 'base64url')
 
-    const validatedHeader = headerSchema.parse(JSON.parse(decodedHeader)) as z.infer<HS>
-    const validatedClaims = claimsSchema.parse(JSON.parse(decodedClaims)) as z.infer<CS>
+    const validatedHeader = validate({
+      schema: headerSchema,
+      data: JSON.parse(decodedHeader),
+      errorMessage: 'invalid header claims provided',
+    })
+    const validatedClaims = validate({
+      schema: claimsSchema,
+      data: JSON.parse(decodedClaims),
+      errorMessage: 'invalid payload claims provided',
+    })
 
     return {
       header: validatedHeader,

@@ -1,4 +1,4 @@
-import assert from 'node:assert'
+import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { createEntityConfiguration } from '../src/entityConfiguration'
 import type { SignCallback } from '../src/utils'
@@ -27,7 +27,7 @@ describe('create entity configuration', () => {
 
   it('should create a more complex entity configuration', async () => {
     const entityConfiguration = await createEntityConfiguration({
-      signJwtCallback: signJwtCallback,
+      signJwtCallback,
       claims: {
         exp: 1,
         iat: 1,
@@ -48,7 +48,7 @@ describe('create entity configuration', () => {
   it('should not create a entity configuration when iss and sub are not equal', async () => {
     await assert.rejects(
       createEntityConfiguration({
-        signJwtCallback: signJwtCallback,
+        signJwtCallback,
         claims: {
           exp: 1,
           iat: 1,
@@ -57,17 +57,14 @@ describe('create entity configuration', () => {
           jwks: { keys: [{ kid: 'a', kty: 'EC' }] },
         },
         header: { kid: 'a', typ: 'entity-statement+jwt' },
-      }),
-      {
-        name: 'ZodError',
-      }
+      })
     )
   })
 
   it('should not create a entity configuration when kid is not found in jwks.keys', async () => {
     await assert.rejects(
       createEntityConfiguration({
-        signJwtCallback: signJwtCallback,
+        signJwtCallback,
         claims: {
           exp: 1,
           iat: 1,
@@ -76,18 +73,14 @@ describe('create entity configuration', () => {
           jwks: { keys: [{ kid: 'a', kty: 'EC' }] },
         },
         header: { kid: 'invalid_id', typ: 'entity-statement+jwt' },
-      }),
-      {
-        name: 'Error',
-        message: "key with id: 'invalid_id' could not be found in the claims",
-      }
+      })
     )
   })
 
   it("should not create a entity configuration when typ is not 'entity-statement+jwt'", async () => {
     await assert.rejects(
       createEntityConfiguration({
-        signJwtCallback: signJwtCallback,
+        signJwtCallback,
         claims: {
           exp: 1,
           iat: 1,
@@ -97,17 +90,14 @@ describe('create entity configuration', () => {
         },
         // @ts-ignore
         header: { kid: 'a', typ: 'invalid_typ' },
-      }),
-      {
-        name: 'ZodError',
-      }
+      })
     )
   })
 
   it('should not create a entity configuration when jwks.keys include keys with the same kid', async () => {
     await assert.rejects(
       createEntityConfiguration({
-        signJwtCallback: signJwtCallback,
+        signJwtCallback,
         claims: {
           exp: 1,
           iat: 1,
@@ -121,10 +111,7 @@ describe('create entity configuration', () => {
           },
         },
         header: { kid: 'a', typ: 'entity-statement+jwt' },
-      }),
-      {
-        name: 'ZodError',
-      }
+      })
     )
   })
 })

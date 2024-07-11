@@ -1,4 +1,4 @@
-import assert from 'node:assert'
+import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { createEntityStatement } from '../src/entityStatement/createEntityStatement'
 import type { SignCallback } from '../src/utils'
@@ -51,6 +51,11 @@ describe('create entity statement', () => {
   it('should not create a basic entity statement with an invalid typ', async () => {
     await assert.rejects(
       createEntityStatement({
+        header: {
+          kid: 'a',
+          // @ts-ignore
+          typ: 'invalid-typ',
+        },
         jwk: { kty: 'EC', kid: 'a' },
         claims: {
           exp: 1,
@@ -58,11 +63,6 @@ describe('create entity statement', () => {
           iss: 'https://example.org',
           sub: 'https://one.example.org',
           jwks: { keys: [{ kty: 'EC', kid: 'b' }] },
-        },
-        header: {
-          kid: 'a',
-          // @ts-ignore
-          typ: 'invalid-typ',
         },
         signJwtCallback,
       })

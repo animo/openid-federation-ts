@@ -1,11 +1,12 @@
 import { type JsonWebKey, createJsonWebToken, createJwtSignableInput } from '../jsonWeb'
 import type { SignCallback } from '../utils'
-import { type EntityStatementClaims, entityStatementClaimsSchema } from './entityStatementClaims'
-import { type EntityStatementHeader, entityStatementHeaderSchema } from './entityStatementHeader'
+import { validate } from '../utils/validate'
+import { type EntityStatementClaimsOptions, entityStatementClaimsSchema } from './entityStatementClaims'
+import { type EntityStatementHeaderOptions, entityStatementHeaderSchema } from './entityStatementHeader'
 
 export type CreateEntityStatementOptions = {
-  claims: EntityStatementClaims
-  header?: EntityStatementHeader
+  claims: EntityStatementClaimsOptions
+  header?: EntityStatementHeaderOptions
   signJwtCallback: SignCallback
   /**
    *
@@ -36,8 +37,16 @@ export const createEntityStatement = async ({
   }
 
   // Validate the input
-  entityStatementClaimsSchema.parse(claims)
-  entityStatementHeaderSchema.parse(header)
+  validate({
+    schema: entityStatementHeaderSchema,
+    data: header,
+    errorMessage: 'invalid header claims provided',
+  })
+  validate({
+    schema: entityStatementClaimsSchema,
+    data: claims,
+    errorMessage: 'invalid payload claims provided',
+  })
 
   // Create a signable input based on the header and payload
   const toBeSigned = createJwtSignableInput(header, claims)
