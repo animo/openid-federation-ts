@@ -24,7 +24,7 @@ describe('fetch entity configuration', () => {
     const entityConfiguration = await createEntityConfiguration({
       header: { kid: 'a', typ: 'entity-statement+jwt' },
       claims,
-      signCallback,
+      signJwtCallback: signCallback,
     })
 
     const scope = nock(entityId).get('/.well-known/openid-federation').reply(200, entityConfiguration, {
@@ -55,7 +55,7 @@ describe('fetch entity configuration', () => {
     const entityConfiguration = await createEntityConfiguration({
       header: { kid: 'a', typ: 'entity-statement+jwt' },
       claims,
-      signCallback,
+      signJwtCallback: signCallback,
     })
 
     const scope = nock(entityId).get('/.well-known/openid-federation').reply(200, entityConfiguration, {

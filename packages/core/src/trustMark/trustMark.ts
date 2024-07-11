@@ -1,4 +1,4 @@
-import { type ZodSchema, z } from 'zod'
+import { z } from 'zod'
 import { jsonWebTokenSchema } from '../jsonWeb'
 import { dateSchema } from '../utils'
 
@@ -14,8 +14,8 @@ export const trustMarkClaimsSchema = z.object({
 export const trustMarkSchema = z.object({
   id: z.string(),
   trust_mark: jsonWebTokenSchema({
-    claimsSchema: trustMarkClaimsSchema as ZodSchema,
+    claimsSchema: trustMarkClaimsSchema,
   }),
 })
 
-export type TrustMark = z.input<typeof trustMarkSchema>
+export type TrustMark = z.output<typeof trustMarkSchema>
