@@ -35,7 +35,11 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "style": {
+        "useNodeAssertStrict": { "level": "error", "fix": "unsafe" },
+        "useNodejsImportProtocol": { "level": "off" }
+      }
     }
   }
 }

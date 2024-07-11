@@ -12,4 +12,6 @@ export const entityStatementHeaderSchema = z
   })
   .passthrough()
 
-export type EntityStatementHeader = z.input<typeof entityStatementHeaderSchema>
+export type EntityStatementHeaderOptions = z.input<typeof entityStatementHeaderSchema>
+
+export type EntityStatementHeader = z.output<typeof entityStatementHeaderSchema>

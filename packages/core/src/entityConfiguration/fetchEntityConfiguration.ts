@@ -1,5 +1,6 @@
-import { verifyJsonWebToken } from '../jsonWeb/verifyJsonWebToken'
+import { verifyJwtSignature } from '../jsonWeb/verifyJsonWebToken'
 import { type VerifyCallback, addPaths, fetcher } from '../utils'
+import { validate } from '../utils/validate'
 import { entityConfigurationJwtSchema } from './entityConfigurationJwt'
 
 export type FetchEntityConfigurationOptions = {
@@ -22,10 +23,14 @@ export const fetchEntityConfiguration = async ({ entityId, verifyJwtCallback }: 
     requiredContentType: 'application/entity-statement+jwt',
   })
 
-  // Parse the JWT into its claims and header claims
-  const { claims, header, signature } = entityConfigurationJwtSchema.parse(entityConfigurationJwt)
+  // Parse the JWT into its claims
+  const { claims } = validate({
+    schema: entityConfigurationJwtSchema,
+    data: entityConfigurationJwt,
+    errorMessage: 'fetched entity configuration JWT is invalid',
+  })
 
-  await verifyJsonWebToken({ signature, verifyJwtCallback, header, claims })
+  await verifyJwtSignature({ jwt: entityConfigurationJwt, verifyJwtCallback })
 
   return claims
 }

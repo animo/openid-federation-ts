@@ -12,4 +12,6 @@ export const entityConfigurationHeaderSchema = z
   })
   .passthrough()
 
-export type EntityConfigurationHeader = z.input<typeof entityConfigurationHeaderSchema>
+export type EntityConfigurationHeaderOptions = z.input<typeof entityConfigurationHeaderSchema>
+
+export type EntityConfigurationHeader = z.output<typeof entityConfigurationHeaderSchema>
