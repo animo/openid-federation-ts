@@ -1,5 +1,4 @@
-import { createJwtSignableInput } from '../jsonWeb'
-import { getUsedJsonWebKey } from '../jsonWeb'
+import { verifyJsonWebToken } from '../jsonWeb/verifyJsonWebToken'
 import { type VerifyCallback, addPaths, fetcher } from '../utils'
 import { entityConfigurationJwtSchema } from './entityConfigurationJwt'
 
@@ -26,28 +25,7 @@ export const fetchEntityConfiguration = async ({ entityId, verifyJwtCallback }: 
   // Parse the JWT into its claims and header claims
   const { claims, header, signature } = entityConfigurationJwtSchema.parse(entityConfigurationJwt)
 
-  const jwk = getUsedJsonWebKey(header, claims)
-
-  // TODO: create byte array of the JWT that has to be verified
-  const toBeVerified = createJwtSignableInput(header, claims)
-
-  try {
-    const isValid = await verifyJwtCallback({
-      signature,
-      jwk,
-      data: toBeVerified,
-    })
-    // TODO: better error message
-    if (!isValid) {
-      throw new Error('Signature in the JWT is invalid')
-    }
-  } catch (e: unknown) {
-    if (typeof e === 'string') {
-      throw new Error(e)
-    }
-
-    throw e
-  }
+  await verifyJsonWebToken({ signature, verifyJwtCallback, header, claims })
 
   return claims
 }

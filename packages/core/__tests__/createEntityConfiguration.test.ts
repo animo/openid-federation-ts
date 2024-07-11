@@ -4,11 +4,11 @@ import { createEntityConfiguration } from '../src/entityConfiguration'
 import type { SignCallback } from '../src/utils'
 
 describe('create entity configuration', () => {
-  const signCallback: SignCallback = () => Promise.resolve(new Uint8Array(42).fill(8))
+  const signJwtCallback: SignCallback = () => Promise.resolve(new Uint8Array(42).fill(8))
 
   it('should create a basic entity configuration', async () => {
     const entityConfiguration = await createEntityConfiguration({
-      signCallback,
+      signJwtCallback,
       claims: {
         exp: 1,
         iat: 1,
@@ -27,7 +27,7 @@ describe('create entity configuration', () => {
 
   it('should create a more complex entity configuration', async () => {
     const entityConfiguration = await createEntityConfiguration({
-      signCallback,
+      signJwtCallback: signJwtCallback,
       claims: {
         exp: 1,
         iat: 1,
@@ -48,7 +48,7 @@ describe('create entity configuration', () => {
   it('should not create a entity configuration when iss and sub are not equal', async () => {
     await assert.rejects(
       createEntityConfiguration({
-        signCallback,
+        signJwtCallback: signJwtCallback,
         claims: {
           exp: 1,
           iat: 1,
@@ -67,7 +67,7 @@ describe('create entity configuration', () => {
   it('should not create a entity configuration when kid is not found in jwks.keys', async () => {
     await assert.rejects(
       createEntityConfiguration({
-        signCallback,
+        signJwtCallback: signJwtCallback,
         claims: {
           exp: 1,
           iat: 1,
@@ -87,7 +87,7 @@ describe('create entity configuration', () => {
   it("should not create a entity configuration when typ is not 'entity-statement+jwt'", async () => {
     await assert.rejects(
       createEntityConfiguration({
-        signCallback,
+        signJwtCallback: signJwtCallback,
         claims: {
           exp: 1,
           iat: 1,
@@ -107,7 +107,7 @@ describe('create entity configuration', () => {
   it('should not create a entity configuration when jwks.keys include keys with the same kid', async () => {
     await assert.rejects(
       createEntityConfiguration({
-        signCallback,
+        signJwtCallback: signJwtCallback,
         claims: {
           exp: 1,
           iat: 1,

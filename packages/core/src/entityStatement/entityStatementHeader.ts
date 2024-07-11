@@ -11,3 +11,5 @@ export const entityStatementHeaderSchema = z
     typ: z.literal('entity-statement+jwt'),
   })
   .passthrough()
+
+export type EntityStatementHeader = z.input<typeof entityStatementHeaderSchema>

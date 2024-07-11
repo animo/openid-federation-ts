@@ -1,7 +1,7 @@
 {
   "name": "openid-federation-ts",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Openid Federation implementation",
   "author": "Animo Solutions",
   "license": "Apache-2.0",
@@ -16,13 +16,13 @@
     "release": "lerna publish"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.8.0",
-    "rimraf": "^5.0.7"
+    "@biomejs/biome": "1.8.3",
+    "rimraf": "^6.0.0"
   },
   "pnpm": {
     "overrides": {
-      "typescript": "~5.3.2",
-      "@types/node": "^20.11.1",
+      "typescript": "~5.5.3",
+      "@types/node": "^20.14.10",
       "ts-node": "^10.9.2"
     }
   }
