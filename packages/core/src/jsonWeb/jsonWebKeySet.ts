@@ -5,4 +5,6 @@ export const jsonWebKeySetSchema = z.object({
   keys: z.array(jsonWebKeySchema),
 })
 
-export type JsonWebKeySet = z.input<typeof jsonWebKeySetSchema>
+export type JsonWebKeySetOptions = z.input<typeof jsonWebKeySetSchema>
+
+export type JsonWebKeySet = z.output<typeof jsonWebKeySetSchema>
