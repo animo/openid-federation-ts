@@ -8,7 +8,8 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "declaration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "noUncheckedIndexedAccess": true
   },
-  "exclude": ["**/tests", "**/build"]
+  "exclude": ["**/__tests__", "**/build"]
 }

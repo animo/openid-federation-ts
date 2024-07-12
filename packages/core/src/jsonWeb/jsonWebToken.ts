@@ -24,8 +24,34 @@ export const jsonWebTokenSchema = <
     headerSchema: defaultSchema as unknown as HS,
   }
 ) =>
-  z.string().transform((s) => {
+  z.string().transform((s, ctx) => {
     const [header, claims, signature] = s.split('.')
+
+    if (!header) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'JWT does not contain a header parameter',
+      })
+      return z.NEVER
+    }
+
+    if (!claims) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'JWT does not contain a payload',
+      })
+      return z.NEVER
+    }
+
+    if (!signature) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'JWT does not contain a signature',
+      })
+
+      return z.NEVER
+    }
+
     const decodedHeader = Buffer.from(header, 'base64url').toString()
     const decodedClaims = Buffer.from(claims, 'base64url').toString()
     const decodedSignature = Buffer.from(signature, 'base64url')

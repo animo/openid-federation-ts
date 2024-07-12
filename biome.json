@@ -34,6 +34,7 @@
   },
   "linter": {
     "enabled": true,
+    "ignore": ["__tests__/*.ts"],
     "rules": {
       "recommended": true,
       "performance": {

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import nock from 'nock'
-import { fetchEntityConfigurationChains } from '../src/entityConfiguration'
+import { EntityConfigurationClaimsOptions, fetchEntityConfigurationChains } from '../src/entityConfiguration'
 import type { SignCallback, VerifyCallback } from '../src/utils'
 import { setupConfigurationChain } from './utils/setupConfigurationChain'
 
@@ -13,8 +13,8 @@ describe('fetch entity configuration chains', () => {
     const leafEntityId = 'https://leaf.example.org'
     const trustAnchorEntityId = 'https://trust.example.org'
 
-    const scopes = []
-    const claims = []
+    const scopes: Array<nock.Scope> = []
+    const claims: Array<EntityConfigurationClaimsOptions> = []
 
     const configurations = await setupConfigurationChain(
       [{ entityId: leafEntityId, authorityHints: [trustAnchorEntityId] }, { entityId: trustAnchorEntityId }],
@@ -37,10 +37,10 @@ describe('fetch entity configuration chains', () => {
     })
 
     assert.strictEqual(trustChains.length, 1)
-    assert.strictEqual(trustChains[0].length, 2)
+    assert.strictEqual(trustChains[0]!.length, 2)
 
-    assert.deepStrictEqual(trustChains[0][0], claims[0])
-    assert.deepStrictEqual(trustChains[0][1], claims[1])
+    assert.deepStrictEqual(trustChains[0]![0], claims[0])
+    assert.deepStrictEqual(trustChains[0]![1], claims[1])
 
     for (const scope of scopes) {
       scope.done()
@@ -52,8 +52,8 @@ describe('fetch entity configuration chains', () => {
     const intermediateEntityId = 'https://intermediate.example.org'
     const trustAnchorEntityId = 'https://trust.example.org'
 
-    const scopes = []
-    const claims = []
+    const scopes: Array<nock.Scope> = []
+    const claims: Array<EntityConfigurationClaimsOptions> = []
 
     const configurations = await setupConfigurationChain(
       [
@@ -83,11 +83,11 @@ describe('fetch entity configuration chains', () => {
     })
 
     assert.strictEqual(trustChains.length, 1)
-    assert.strictEqual(trustChains[0].length, 3)
+    assert.strictEqual(trustChains[0]!.length, 3)
 
-    assert.deepStrictEqual(trustChains[0][0], claims[0])
-    assert.deepStrictEqual(trustChains[0][1], claims[1])
-    assert.deepStrictEqual(trustChains[0][2], claims[2])
+    assert.deepStrictEqual(trustChains[0]![0], claims[0])
+    assert.deepStrictEqual(trustChains[0]![1], claims[1])
+    assert.deepStrictEqual(trustChains[0]![2], claims[2])
 
     for (const scope of scopes) {
       scope.done()
@@ -99,8 +99,8 @@ describe('fetch entity configuration chains', () => {
     const trustAnchorEntityId = 'https://trust.example.org'
     const superiorTrustAnchorEntityId = 'https://trust.superior.example.org'
 
-    const scopes = []
-    const claims = []
+    const scopes: Array<nock.Scope> = []
+    const claims: Array<EntityConfigurationClaimsOptions> = []
 
     const configurations = await setupConfigurationChain(
       [
@@ -130,10 +130,10 @@ describe('fetch entity configuration chains', () => {
     })
 
     assert.strictEqual(trustChains.length, 1)
-    assert.strictEqual(trustChains[0].length, 2)
+    assert.strictEqual(trustChains[0]!.length, 2)
 
-    assert.deepStrictEqual(trustChains[0][0], claims[0])
-    assert.deepStrictEqual(trustChains[0][1], claims[1])
+    assert.deepStrictEqual(trustChains[0]![0], claims[0])
+    assert.deepStrictEqual(trustChains[0]![1], claims[1])
 
     for (const scope of scopes) {
       scope.done()
@@ -147,8 +147,8 @@ describe('fetch entity configuration chains', () => {
     const trustAnchorOneEntityId = 'https://trust.one.example.org'
     const trustAnchorTwoEntityId = 'https://trust.two.example.org'
 
-    const scopes = []
-    const claims = []
+    const scopes: Array<nock.Scope> = []
+    const claims: Array<EntityConfigurationClaimsOptions> = []
 
     const configurations = await setupConfigurationChain(
       [
@@ -186,8 +186,8 @@ describe('fetch entity configuration chains', () => {
     })
 
     assert.strictEqual(trustChains.length, 2)
-    assert.strictEqual(trustChains[0].length, 3)
-    assert.strictEqual(trustChains[1].length, 3)
+    assert.strictEqual(trustChains[0]!.length, 3)
+    assert.strictEqual(trustChains[1]!.length, 3)
 
     for (const scope of scopes) {
       scope.done()
@@ -201,8 +201,8 @@ describe('fetch entity configuration chains', () => {
     const trustAnchorOneEntityId = 'https://trust.one.example.org'
     const trustAnchorTwoEntityId = 'https://trust.two.example.org'
 
-    const scopes = []
-    const claims = []
+    const scopes: Array<nock.Scope> = []
+    const claims: Array<EntityConfigurationClaimsOptions> = []
 
     const configurations = await setupConfigurationChain(
       [
@@ -240,7 +240,7 @@ describe('fetch entity configuration chains', () => {
     })
 
     assert.strictEqual(trustChains.length, 1)
-    assert.strictEqual(trustChains[0].length, 3)
+    assert.strictEqual(trustChains[0]!.length, 3)
 
     for (const scope of scopes) {
       scope.done()
@@ -248,7 +248,7 @@ describe('fetch entity configuration chains', () => {
   })
 
   it('should not fetch an entity configuration chain when no authority_hints are found', async () => {
-    const scopes = []
+    const scopes: Array<nock.Scope> = []
 
     const configurations = await setupConfigurationChain([{ entityId: 'https://leaf.example.org' }], signJwtCallback)
 
@@ -262,7 +262,7 @@ describe('fetch entity configuration chains', () => {
 
     const trustChains = await fetchEntityConfigurationChains({
       verifyJwtCallback,
-      leafEntityId: configurations[0].entityId,
+      leafEntityId: configurations[0]!.entityId,
       trustAnchorEntityIds: ['https://trust.example.org'],
     })
 
@@ -274,7 +274,7 @@ describe('fetch entity configuration chains', () => {
   })
 
   it('should not fetch an entity configuration chain when a loop is found', async () => {
-    const scopes = []
+    const scopes: Array<nock.Scope> = []
 
     const leafEntityId = 'https://leaf.example.org'
     const intermediateOneEntityId = 'https://intermediate.one.example.org'
@@ -306,7 +306,7 @@ describe('fetch entity configuration chains', () => {
 
     const trustChains = await fetchEntityConfigurationChains({
       verifyJwtCallback,
-      leafEntityId: configurations[0].entityId,
+      leafEntityId: configurations[0]!.entityId,
       trustAnchorEntityIds: [trustAnchorEntityId],
     })
 
@@ -315,5 +315,15 @@ describe('fetch entity configuration chains', () => {
     for (const scope of scopes) {
       scope.done()
     }
+  })
+
+  it('should not fetch an entity configuration chain when no trust anchors are provided', async () => {
+    await assert.rejects(
+      fetchEntityConfigurationChains({
+        verifyJwtCallback,
+        leafEntityId: 'https://example.org',
+        trustAnchorEntityIds: [],
+      })
+    )
   })
 })
