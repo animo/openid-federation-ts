@@ -36,6 +36,9 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "performance": {
+        "noDelete": { "level": "off" }
+      },
       "style": {
         "useNodeAssertStrict": { "level": "error", "fix": "unsafe" },
         "useNodejsImportProtocol": { "level": "off" }
