@@ -1,3 +1,6 @@
+import { ErrorCode } from '../error/ErrorCode'
+import { OpenIdFederationError } from '../error/OpenIdFederationError'
+
 /**
  *
  * Add paths to a url
@@ -18,6 +21,10 @@
  */
 export const addPaths = (baseUrl: string, ...paths: Array<string>) => {
   const [scheme, rest] = baseUrl.split('://')
+  if (!rest) {
+    throw new OpenIdFederationError(ErrorCode.Validation, 'not a valid URL')
+  }
+
   const urlWithoutScheme = rest
     // Get all base the parts
     .split('/')

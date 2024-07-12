@@ -1,8 +1,10 @@
+import { ErrorCode } from '../error/ErrorCode'
+import { OpenIdFederationError } from '../error/OpenIdFederationError'
 import type { VerifyCallback } from '../utils'
 import type { EntityConfigurationClaims } from './entityConfigurationClaims'
 import { fetchEntityConfiguration } from './fetchEntityConfiguration'
 
-type FetchEntityConfigurationChainOptions = {
+export type FetchEntityConfigurationChainOptions = {
   leafEntityId: string
   trustAnchorEntityIds: Array<string>
   verifyJwtCallback: VerifyCallback
@@ -18,6 +20,13 @@ type FetchEntityConfigurationChainOptions = {
 export const fetchEntityConfigurationChains = async (
   options: FetchEntityConfigurationChainOptions
 ): Promise<Array<Array<EntityConfigurationClaims>>> => {
+  if (options.trustAnchorEntityIds.length === 0) {
+    throw new OpenIdFederationError(
+      ErrorCode.Validation,
+      'Cannot establish a configuration chain for zero trust anchors'
+    )
+  }
+
   // inner function so we can expose a more user-friendly API
   const __fetchEntityConfigurationChains = async (
     currentEntityId: string,
