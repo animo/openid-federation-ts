@@ -17,13 +17,17 @@ describe('End To End', async () => {
     key_ops: exportedKey.key_ops,
     x: exportedKey.x,
     y: exportedKey.y,
+    crv: exportedKey.crv,
   }
 
   const signJwtCallback: SignCallback = async ({ toBeSigned }) =>
     new Uint8Array(await subtle.sign({ hash: 'SHA-256', name: 'ECDSA' }, key.privateKey, toBeSigned))
 
-  const verifyJwtCallback: VerifyCallback = async ({ signature, data }) =>
-    subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key.publicKey, signature, data)
+  const verifyJwtCallback: VerifyCallback = async ({ signature, data, jwk }) => {
+    const publicKey = await subtle.importKey('jwk', jwk, { name: 'ECDSA', namedCurve: 'P-256' }, true, ['verify'])
+
+    return subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, publicKey, signature, data)
+  }
 
   it('should fetch an entity configuration', async () => {
     const iss = 'https://example.org'
