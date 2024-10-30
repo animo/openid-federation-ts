@@ -91,12 +91,3 @@ jobs:
 
                   version=$(node -p "require('./lerna.json').version")
                   echo "LERNA_VERSION=$version" >> "$GITHUB_OUTPUT"
-
-            - name: Create Github Release
-              uses: softprops/action-gh-release@v1
-              with:
-                  generate_release_notes: true
-                  prerelease: ${{ inputs.release-type == 'alpha' }}
-                  token: ${{ secrets.GH_TOKEN }}
-                  tag_name: v${{ steps.publish.outputs.LERNA_VERSION }}
-                  name: Release v${{ steps.publish.outputs.LERNA_VERSION }}
