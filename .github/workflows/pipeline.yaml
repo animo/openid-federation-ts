@@ -37,13 +37,13 @@ jobs:
               run: pnpm install
 
             - name: Check formatting
-              run: pnpm check:style
+              run: pnpm style:fix
 
             - name: Build
               run: pnpm build
 
             - name: Check types
-              run: pnpm check:types
+              run: pnpm types:check
 
             - name: Test
               run: pnpm test

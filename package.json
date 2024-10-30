@@ -12,9 +12,9 @@
     "clean": "rimraf **/build",
     "clean:deps ": "pnpm clean && rimraf node_modules",
     "build": "pnpm -r build",
-    "check:style": "pnpm biome check .",
-    "check:types": "pnpm build --noEmit",
-    "format": "pnpm check:style --write --unsafe",
+    "style:check": "pnpm biome check .",
+    "style:fix": "pnpm style:check --write --unsafe",
+    "types:check": "pnpm build --noEmit",
     "test": "pnpm -r test",
     "release": "lerna publish"
   },
