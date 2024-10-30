@@ -5,6 +5,9 @@
   "description": "Openid Federation implementation",
   "author": "Animo Solutions",
   "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "clean": "rimraf **/build",
     "clean:deps ": "pnpm clean && rimraf node_modules",
