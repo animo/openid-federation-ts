@@ -58,5 +58,12 @@ export const fetchEntityStatementChain = async ({
   }
 
   // The trust anchors (i.e. the last item of the list) entity configuration will be used instead of a statement issued by a superior
-  return [entityConfigurations[entityConfigurations.length - 1], ...(await Promise.all(promises))].reverse()
+
+  const trustAnchorEntityConfiguration = entityConfigurations[entityConfigurations.length - 1]
+  // Should never happen because there will always be a trust anchor in a valid chain
+  if (!trustAnchorEntityConfiguration) {
+    throw new OpenIdFederationError(ErrorCode.Validation, 'No trust anchor entity configuration found')
+  }
+
+  return [trustAnchorEntityConfiguration, ...(await Promise.all(promises))].reverse()
 }

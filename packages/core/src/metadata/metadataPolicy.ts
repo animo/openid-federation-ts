@@ -16,3 +16,5 @@ export const metadataPolicySchema = z.object({
   [oauthClientEntityMetadata.identifier]: oauthClientEntityMetadata.policySchema.optional(),
   [oauthResourceEntityMetadata.identifier]: oauthResourceEntityMetadata.policySchema.optional(),
 })
+
+export type MetadataPolicy = z.infer<typeof metadataPolicySchema>
