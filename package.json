@@ -16,7 +16,8 @@
     "style:fix": "pnpm style:check --write --unsafe",
     "types:check": "pnpm build --noEmit",
     "test": "pnpm -r test",
-    "release": "lerna publish"
+    "release": "lerna publish",
+    "validate": "pnpm types:check && pnpm style:check"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",

@@ -8,6 +8,9 @@ export type SignCallback = (options: {
 }) => Promise<Uint8Array>
 
 export type VerifyCallback = (options: {
+  jwt: string
+  header: Record<string, unknown>
+  claims: Record<string, unknown>
   data: Uint8Array
   signature: Uint8Array
   jwk: JsonWebKey

@@ -18,6 +18,9 @@ export const verifyJwtSignature = async ({ jwt, jwks, verifyJwtCallback }: Verif
 
   try {
     const isValid = await verifyJwtCallback({
+      jwt,
+      header,
+      claims,
       signature,
       jwk,
       data: signableInput,
