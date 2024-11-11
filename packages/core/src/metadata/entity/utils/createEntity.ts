@@ -5,12 +5,12 @@ import { metadataPolicySchema } from '../../policy'
 
 export const createEntity = <T extends string, S extends z.ZodRawShape>({
   identifier,
-  additionalValidation,
+  additionalValidation = {} as S,
 }: {
   identifier: T
   additionalValidation?: S
 }) => {
-  const schema = commonMetadataSchema.extend(additionalValidation ?? {})
+  const schema = commonMetadataSchema.extend(additionalValidation)
   return {
     identifier,
     schema,
