@@ -3,14 +3,14 @@ import { commonMetadataSchema } from '../../common'
 import { swapValidators } from '../../operator'
 import { metadataPolicySchema } from '../../policy'
 
-export const createEntity = <T extends string>({
+export const createEntity = <T extends string, S extends z.ZodRawShape>({
   identifier,
-  additionalValidation = {},
+  additionalValidation,
 }: {
   identifier: T
-  additionalValidation?: z.ZodRawShape
+  additionalValidation?: S
 }) => {
-  const schema = commonMetadataSchema.extend(additionalValidation)
+  const schema = commonMetadataSchema.extend(additionalValidation ?? {})
   return {
     identifier,
     schema,
