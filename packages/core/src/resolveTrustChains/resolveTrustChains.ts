@@ -7,8 +7,10 @@
 //    * when no trust chain with valid applied could be found
 // resolveTrustChains(entityId: string, trustAnchorEntityIds: Array<string>) -> Promise<Array<TrustChain>>
 
-import { fetchEntityConfigurationChains } from '../entityConfiguration'
+import { type fetchEntityConfiguration, fetchEntityConfigurationChains } from '../entityConfiguration'
 import { fetchEntityStatementChain } from '../entityStatement'
+import { ErrorCode } from '../error/ErrorCode'
+import { OpenIdFederationError } from '../error/OpenIdFederationError'
 import type { VerifyCallback } from '../utils'
 
 type Options = {
@@ -17,10 +19,23 @@ type Options = {
   trustAnchorEntityIds: Array<string>
 }
 
-type TrustChain = Awaited<ReturnType<typeof fetchEntityStatementChain>>
+// TODO: Use more direct types instead of Awaited return types
+type TrustChain = {
+  chain: Awaited<ReturnType<typeof fetchEntityStatementChain>>
+  // TODO: Not sure if this needs to be the entity configuration with all the policies applied
+  entityConfiguration: Awaited<ReturnType<typeof fetchEntityConfiguration>>
+}
 
 // TODO: Apply the policies
+// TODO: Look into what we want to return in this function. Because the entity configuration is also very valuable
+// TODO: We might also need to return the entity configuration which has all the policies applied. So that a chain has both the statements and the configuration
 
+/**
+ * Resolves the trust chains for the given entityId and trust anchor entityIds.
+ *
+ * @param options - The options for the trust chain resolution.
+ * @returns A promise that resolves to an array of trust chains. (The first item in the trust chain is the leaf entity configuration, the last item is the trust anchor entity configuration)
+ */
 export const resolveTrustChains = async (options: Options): Promise<Array<TrustChain>> => {
   const { entityId, trustAnchorEntityIds, verifyJwtCallback } = options
 
@@ -34,10 +49,10 @@ export const resolveTrustChains = async (options: Options): Promise<Array<TrustC
 
   const trustChains: Array<TrustChain> = []
 
-  for (const chain of entityConfigurationChains) {
+  for (const entityConfigurationChain of entityConfigurationChains) {
     // The last item in the chain is the trust anchor's entity configuration
     const entityStatementChain = await fetchEntityStatementChain({
-      entityConfigurations: chain,
+      entityConfigurations: entityConfigurationChain,
       verifyJwtCallback,
     })
 
@@ -48,7 +63,15 @@ export const resolveTrustChains = async (options: Options): Promise<Array<TrustC
 
     // TODO: Merge all the policies and check them against the metadata of the leaf entity
 
-    trustChains.push(entityStatementChain)
+    const leafEntityConfiguration = entityConfigurationChain[0]
+    // Should never happen but for the type safety
+    if (!leafEntityConfiguration)
+      throw new OpenIdFederationError(ErrorCode.Validation, 'No leaf entity configuration found')
+
+    trustChains.push({
+      chain: entityStatementChain,
+      entityConfiguration: leafEntityConfiguration,
+    })
   }
 
   return trustChains
