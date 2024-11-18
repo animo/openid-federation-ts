@@ -23,7 +23,8 @@ type Options = {
 type TrustChain = {
   chain: Awaited<ReturnType<typeof fetchEntityStatementChain>>
   // TODO: Not sure if this needs to be the entity configuration with all the policies applied
-  entityConfiguration: Awaited<ReturnType<typeof fetchEntityConfiguration>>
+  leafEntityConfiguration: Awaited<ReturnType<typeof fetchEntityConfiguration>>
+  trustAnchorEntityConfiguration: Awaited<ReturnType<typeof fetchEntityConfiguration>>
 }
 
 // TODO: Apply the policies
@@ -68,9 +69,14 @@ export const resolveTrustChains = async (options: Options): Promise<Array<TrustC
     if (!leafEntityConfiguration)
       throw new OpenIdFederationError(ErrorCode.Validation, 'No leaf entity configuration found')
 
+    const trustAnchorEntityConfiguration = entityConfigurationChain[entityConfigurationChain.length - 1]
+    if (!trustAnchorEntityConfiguration)
+      throw new OpenIdFederationError(ErrorCode.Validation, 'No trust anchor entity configuration found')
+
     trustChains.push({
       chain: entityStatementChain,
-      entityConfiguration: leafEntityConfiguration,
+      trustAnchorEntityConfiguration,
+      leafEntityConfiguration,
     })
   }
 
