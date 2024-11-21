@@ -22,9 +22,9 @@ export const parseJsonWebToken = (jwt: string): JsonWebTokenParts => {
     throw new Error('could not find the signature in the JWT')
   }
 
-  const header = JSON.parse(Buffer.from(encodedHeader, 'base64url').toString())
-  const claims = JSON.parse(Buffer.from(encodedClaims, 'base64url').toString())
-  const signature = new Uint8Array(Buffer.from(encodedSignature, 'base64url'))
+  const header = JSON.parse(Buffer.from(encodedHeader, 'base64').toString())
+  const claims = JSON.parse(Buffer.from(encodedClaims, 'base64').toString())
+  const signature = new Uint8Array(Buffer.from(encodedSignature, 'base64'))
 
   return {
     header,

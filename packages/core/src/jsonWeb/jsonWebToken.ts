@@ -52,9 +52,9 @@ export const jsonWebTokenSchema = <
       return z.NEVER
     }
 
-    const decodedHeader = Buffer.from(header, 'base64url').toString()
-    const decodedClaims = Buffer.from(claims, 'base64url').toString()
-    const decodedSignature = Buffer.from(signature, 'base64url')
+    const decodedHeader = Buffer.from(header, 'base64').toString()
+    const decodedClaims = Buffer.from(claims, 'base64').toString()
+    const decodedSignature = Buffer.from(signature, 'base64')
 
     const validatedHeader = validate({
       schema: headerSchema,

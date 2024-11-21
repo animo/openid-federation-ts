@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer'
+import { base64ToBase64URL } from '../utils/encoding'
 
 /**
  *
@@ -10,10 +11,10 @@ export const createJsonWebToken = (
   payload: Record<string, unknown>,
   signature: Uint8Array
 ) => {
-  const encodedHeader = Buffer.from(JSON.stringify(header)).toString('base64url')
-  const encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64url')
+  const encodedHeader = base64ToBase64URL(Buffer.from(JSON.stringify(header)).toString('base64'))
+  const encodedPayload = base64ToBase64URL(Buffer.from(JSON.stringify(payload)).toString('base64'))
 
-  const encodedSignature = Buffer.from(signature).toString('base64url')
+  const encodedSignature = base64ToBase64URL(Buffer.from(signature).toString('base64'))
 
   return `${encodedHeader}.${encodedPayload}.${encodedSignature}`
 }
