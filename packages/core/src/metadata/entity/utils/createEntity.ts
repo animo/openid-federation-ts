@@ -15,7 +15,7 @@ export const createEntity = <T extends string, S extends z.ZodRawShape>({
   const schema = commonMetadataSchema.extend(additionalValidation)
   return {
     identifier,
-    schema: passThroughUnknownProperties ? schema : schema.passthrough(),
+    schema: passThroughUnknownProperties ? schema.passthrough() : schema,
     policySchema: swapValidators(schema, metadataPolicySchema.optional()),
   }
 }

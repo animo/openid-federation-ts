@@ -1,5 +1,9 @@
 import { describe, it } from 'node:test'
-import { createEntityConfiguration, fetchEntityConfiguration } from '../src/entityConfiguration'
+import {
+  type EntityConfigurationClaimsOptions,
+  createEntityConfiguration,
+  fetchEntityConfiguration,
+} from '../src/entityConfiguration'
 import type { SignCallback, VerifyCallback } from '../src/utils'
 
 import assert from 'node:assert/strict'
@@ -20,6 +24,43 @@ describe('fetch entity configuration', () => {
       exp: new Date(),
       jwks: { keys: [{ kid: 'a', kty: 'EC' }] },
     }
+
+    const entityConfiguration = await createEntityConfiguration({
+      header: { kid: 'a', typ: 'entity-statement+jwt' },
+      claims,
+      signJwtCallback,
+    })
+
+    const scope = nock(entityId).get('/.well-known/openid-federation').reply(200, entityConfiguration, {
+      'content-type': 'application/entity-statement+jwt',
+    })
+
+    const fetchedEntityConfiguration = await fetchEntityConfiguration({
+      entityId,
+      verifyJwtCallback,
+    })
+
+    assert.deepStrictEqual(fetchedEntityConfiguration, claims)
+
+    scope.done()
+  })
+
+  it('should fetch an entity configuration with metadata and unknown properties', async () => {
+    const entityId = 'https://example.org'
+
+    const claims = {
+      iss: entityId,
+      sub: entityId,
+      iat: new Date(),
+      exp: new Date(),
+      metadata: {
+        openid_relying_party: {
+          client_name: 'bakfiets',
+          client_registration_types: ['automatic'],
+        },
+      },
+      jwks: { keys: [{ kid: 'a', kty: 'EC' }] },
+    } satisfies EntityConfigurationClaimsOptions
 
     const entityConfiguration = await createEntityConfiguration({
       header: { kid: 'a', typ: 'entity-statement+jwt' },
