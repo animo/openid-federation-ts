@@ -36,7 +36,7 @@ export const fetchEntityStatement = async ({
   const issEntityConfigurationClaims =
     issEntityConfiguration ?? (await fetchEntityConfiguration({ entityId: iss, verifyJwtCallback }))
 
-  const fetchEndpoint = endpoint ?? issEntityConfigurationClaims.source_endpoint
+  const fetchEndpoint = endpoint ?? issEntityConfigurationClaims.metadata?.federation_entity?.federation_fetch_endpoint
 
   if (!fetchEndpoint) {
     throw new Error('No fetch endpoint provided or in the issuer configuration')

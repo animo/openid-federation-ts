@@ -79,7 +79,11 @@ describe('End To End', async () => {
         jwks: {
           keys: [publicKeyJwk],
         },
-        source_endpoint: `${iss}/fetch`,
+        metadata: {
+          federation_entity: {
+            federation_fetch_endpoint: `${iss}/fetch`,
+          },
+        },
       },
       header: {
         kid: 'some-id',

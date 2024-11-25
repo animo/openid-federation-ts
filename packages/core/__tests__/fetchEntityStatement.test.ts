@@ -22,7 +22,11 @@ describe('fetch entity statement', () => {
         },
         sub: iss,
         iss,
-        source_endpoint: `${iss}/fetch`,
+        metadata: {
+          federation_entity: {
+            federation_fetch_endpoint: `${iss}/fetch`,
+          },
+        },
         iat: 1,
         exp: 1,
       },
@@ -90,7 +94,11 @@ describe('fetch entity statement', () => {
         },
         sub: iss,
         iss,
-        source_endpoint: `${iss}/fetch`,
+        metadata: {
+          federation_entity: {
+            federation_fetch_endpoint: `${iss}/fetch`,
+          },
+        },
         iat: 1,
         exp: 1,
       },
@@ -152,7 +160,11 @@ describe('fetch entity statement', () => {
         },
         sub: iss,
         iss,
-        source_endpoint: `${iss}/fetch`,
+        metadata: {
+          federation_entity: {
+            federation_fetch_endpoint: `${iss}/fetch`,
+          },
+        },
         iat: 1,
         exp: 1,
       },
@@ -255,7 +267,11 @@ describe('fetch entity statement', () => {
         iss,
         iat: 1,
         exp: 1,
-        source_endpoint: `${iss}/fetch`,
+        metadata: {
+          federation_entity: {
+            federation_fetch_endpoint: `${iss}/fetch`,
+          },
+        },
       },
       header: {
         kid: 'a',
@@ -295,7 +311,11 @@ describe('fetch entity statement', () => {
         },
         sub: iss,
         iss,
-        source_endpoint: `${iss}/fetch`,
+        metadata: {
+          federation_entity: {
+            federation_fetch_endpoint: `${iss}/fetch`,
+          },
+        },
         iat: 1,
         exp: 1,
       },

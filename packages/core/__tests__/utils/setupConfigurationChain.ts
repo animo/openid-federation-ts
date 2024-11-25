@@ -34,7 +34,11 @@ export const setupConfigurationChain = async (
       iat: new Date(),
       jwks: jwks ?? { keys: [{ kid: 'a', kty: 'EC' }] },
       authority_hints: authorityHints,
-      source_endpoint: `${entityId}/fetch`,
+      metadata: {
+        federation_entity: {
+          federation_fetch_endpoint: `${entityId}/fetch`,
+        },
+      },
     }
 
     // fix so `undefined` is not in the expected claims

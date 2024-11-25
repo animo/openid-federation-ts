@@ -37,12 +37,12 @@ export const fetchEntityStatementChain = async ({
     // If we have no subject configuration we have reached the leaf entity as the `configuration`
     if (!subjectConfiguration) continue
 
-    const fetchEndpoint = configuration?.source_endpoint
+    const fetchEndpoint = configuration?.metadata?.federation_entity?.federation_fetch_endpoint
 
     if (!fetchEndpoint) {
       throw new OpenIdFederationError(
         ErrorCode.Validation,
-        `No source endpoint found for configuration for: '${configuration?.sub}'`
+        `No fetch endpoint found for configuration for: '${configuration?.sub}'`
       )
     }
 
