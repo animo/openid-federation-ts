@@ -10,6 +10,7 @@ import { createEntity } from './utils'
  */
 export const openidRelyingPartyEntityMetadata = createEntity({
   identifier: 'openid_relying_party',
+  passThroughUnknownProperties: true,
   additionalValidation: {
     client_registration_types: z.array(z.union([z.literal('automatic'), z.literal('explicit')])),
   },
