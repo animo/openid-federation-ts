@@ -15,3 +15,5 @@ export type VerifyCallback = (options: {
   signature: Uint8Array
   jwk: JsonWebKey
 }) => Promise<boolean>
+
+export type FetchCallback = typeof fetch

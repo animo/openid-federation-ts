@@ -8,6 +8,7 @@ import { createEntity } from './utils'
  */
 export const openIdProviderEntityMetadata = createEntity({
   identifier: 'openid_provider',
+  passThroughUnknownProperties: true,
   additionalValidation: {
     client_registration_types_supported: z.array(z.union([z.literal('automatic'), z.literal('explicit')])),
     federation_registration_endpoint: z.string().url().optional(),

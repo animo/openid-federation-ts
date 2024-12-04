@@ -1,11 +1,12 @@
 import { verifyJwtSignature } from '../jsonWeb/verifyJsonWebToken'
-import { type VerifyCallback, addPaths, fetcher } from '../utils'
+import { type FetchCallback, type VerifyCallback, addPaths, fetcher } from '../utils'
 import { validate } from '../utils/validate'
 import { entityConfigurationJwtSchema } from './entityConfigurationJwt'
 
 export type FetchEntityConfigurationOptions = {
   entityId: string
   verifyJwtCallback: VerifyCallback
+  fetchCallback?: FetchCallback
 }
 
 /**
@@ -13,7 +14,11 @@ export type FetchEntityConfigurationOptions = {
  * {@link https://openid.net/specs/openid-federation-1_0.html#section-9.1 | Federation Entity Request}
  *
  */
-export const fetchEntityConfiguration = async ({ entityId, verifyJwtCallback }: FetchEntityConfigurationOptions) => {
+export const fetchEntityConfiguration = async ({
+  entityId,
+  verifyJwtCallback,
+  fetchCallback,
+}: FetchEntityConfigurationOptions) => {
   // Create the entity URL
   const federationUrl = addPaths(entityId, '.well-known', 'openid-federation')
 
@@ -21,6 +26,7 @@ export const fetchEntityConfiguration = async ({ entityId, verifyJwtCallback }: 
   const entityConfigurationJwt = await fetcher.get({
     url: federationUrl,
     requiredContentType: 'application/entity-statement+jwt',
+    fetchCallback,
   })
 
   // Parse the JWT into its claims

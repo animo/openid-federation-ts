@@ -1,6 +1,6 @@
 import { type EntityConfigurationClaims, fetchEntityConfiguration } from '../entityConfiguration'
 import { verifyJwtSignature } from '../jsonWeb/verifyJsonWebToken'
-import { type VerifyCallback, fetcher } from '../utils'
+import { type FetchCallback, type VerifyCallback, fetcher } from '../utils'
 import { validate } from '../utils/validate'
 import { entityStatementJwtSchema } from './entityStatementJwt'
 
@@ -8,6 +8,7 @@ export type FetchEntityStatementOptions = {
   iss: string
   sub: string
   verifyJwtCallback: VerifyCallback
+  fetchCallback?: FetchCallback
   /**
    *
    * The issuers entity configuration
@@ -32,9 +33,10 @@ export const fetchEntityStatement = async ({
   iss,
   endpoint,
   issEntityConfiguration,
+  fetchCallback,
 }: FetchEntityStatementOptions) => {
   const issEntityConfigurationClaims =
-    issEntityConfiguration ?? (await fetchEntityConfiguration({ entityId: iss, verifyJwtCallback }))
+    issEntityConfiguration ?? (await fetchEntityConfiguration({ entityId: iss, verifyJwtCallback, fetchCallback }))
 
   const fetchEndpoint = endpoint ?? issEntityConfigurationClaims.metadata?.federation_entity?.federation_fetch_endpoint
 
@@ -46,6 +48,7 @@ export const fetchEntityStatement = async ({
     url: fetchEndpoint,
     searchParams: { iss, sub },
     requiredContentType: 'application/entity-statement+jwt',
+    fetchCallback,
   })
 
   // Parse the JWT into its claims and header claims

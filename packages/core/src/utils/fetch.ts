@@ -1,4 +1,5 @@
 import type { z } from 'zod'
+import type { FetchCallback } from './types'
 import { addSearchParams } from './url'
 import { validate } from './validate'
 
@@ -7,16 +8,18 @@ const get = async <T extends z.ZodSchema>({
   searchParams,
   responseValidationSchema,
   requiredContentType,
+  fetchCallback = global.fetch,
 }: {
   url: string
   searchParams?: Record<string, string>
   responseValidationSchema?: T
   requiredContentType?: string
+  fetchCallback?: FetchCallback
 }): Promise<typeof responseValidationSchema extends T ? z.output<T> : string> => {
   // Fetch the url with the search params
   const urlSearchParams = new URLSearchParams(searchParams)
   const urlWithSearchParams = addSearchParams(url, urlSearchParams)
-  const response = await global.fetch(urlWithSearchParams, {
+  const response = await fetchCallback(urlWithSearchParams, {
     method: 'GET',
   })
 
@@ -53,12 +56,14 @@ const post = async ({
   url,
   body,
   responseValidationSchema,
+  fetchCallback = global.fetch,
 }: {
   url: string
   body?: Record<string, unknown>
   responseValidationSchema?: z.ZodSchema
+  fetchCallback?: FetchCallback
 }) => {
-  const response = await global.fetch(url, {
+  const response = await fetchCallback(url, {
     method: 'POST',
     body: body ? JSON.stringify(body) : undefined,
     headers: { 'Content-Type': 'application/json' },
@@ -81,4 +86,4 @@ const post = async ({
 export const fetcher = {
   get,
   post,
-}
+} as const
