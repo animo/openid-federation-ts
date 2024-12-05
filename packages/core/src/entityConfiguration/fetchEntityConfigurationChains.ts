@@ -1,6 +1,6 @@
 import { ErrorCode } from '../error/ErrorCode'
 import { OpenIdFederationError } from '../error/OpenIdFederationError'
-import type { VerifyCallback } from '../utils'
+import type { FetchCallback, VerifyCallback } from '../utils'
 import type { EntityConfigurationClaims } from './entityConfigurationClaims'
 import { fetchEntityConfiguration } from './fetchEntityConfiguration'
 
@@ -8,6 +8,7 @@ export type FetchEntityConfigurationChainOptions = {
   leafEntityId: string
   trustAnchorEntityIds: Array<string>
   verifyJwtCallback: VerifyCallback
+  fetchCallback?: FetchCallback
 }
 
 /**
@@ -35,6 +36,7 @@ export const fetchEntityConfigurationChains = async (
     // Fetch the entity configuration of the current entity id
     const configuration = await fetchEntityConfiguration({
       verifyJwtCallback: options.verifyJwtCallback,
+      fetchCallback: options.fetchCallback,
       entityId: currentEntityId,
     })
 
