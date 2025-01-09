@@ -33,9 +33,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "catalog:",
     "nock": "catalog:",
-    "ts-node": "catalog:",
-    "typescript": "catalog:"
+    "tsup": "catalog:"
   }
 }

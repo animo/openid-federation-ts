@@ -10,7 +10,7 @@
     "build": "pnpm -r build",
     "style:check": "biome check . --unsafe",
     "style:fix": "pnpm style:check --write",
-    "types:check": "pnpm build --noEmit",
+    "types:check": "tsc --noEmit",
     "test": "node --import tsx --test packages/core/__tests__/*.test.ts",
     "release": "pnpm build && pnpm changeset publish --no-git-tag",
     "changeset-version": "pnpm changeset version && pnpm style:fix"
@@ -21,7 +21,8 @@
     "@types/node": "catalog:",
     "rimraf": "catalog:",
     "tsup": "catalog:",
-    "tsx": "^4.19.2"
+    "tsx": "catalog:",
+    "typescript": "catalog:"
   },
   "engines": {
     "node": ">=18"

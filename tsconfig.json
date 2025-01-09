@@ -12,5 +12,5 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "exclude": ["**/build"]
+  "exclude": ["**/build", "__tests__"]
 }
