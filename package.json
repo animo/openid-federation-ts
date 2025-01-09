@@ -1,34 +1,31 @@
 {
   "name": "openid-federation-ts",
   "private": true,
-  "version": "0.0.0",
   "description": "Openid Federation implementation",
   "author": "Animo Solutions",
   "license": "Apache-2.0",
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
     "clean": "rimraf **/build",
     "clean:deps ": "pnpm clean && rimraf node_modules",
     "build": "pnpm -r build",
-    "style:check": "pnpm biome check .",
-    "style:fix": "pnpm style:check --write --unsafe",
-    "types:check": "pnpm build --noEmit",
-    "test": "pnpm -r test",
-    "release": "lerna publish",
-    "validate": "pnpm types:check && pnpm style:check"
+    "style:check": "biome check . --unsafe",
+    "style:fix": "pnpm style:check --write",
+    "types:check": "tsc --noEmit",
+    "test": "node --import tsx --test packages/core/__tests__/*.test.ts",
+    "release": "pnpm build && pnpm changeset publish --no-git-tag",
+    "changeset-version": "pnpm changeset version && pnpm style:fix"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.8.3",
-    "rimraf": "^6.0.0",
-    "tsx": "^4.19.2"
+    "@biomejs/biome": "catalog:",
+    "@changesets/cli": "catalog:",
+    "@types/node": "catalog:",
+    "rimraf": "catalog:",
+    "tsup": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:"
   },
-  "pnpm": {
-    "overrides": {
-      "typescript": "~5.5.3",
-      "@types/node": "^20.14.10",
-      "ts-node": "^10.9.2"
-    }
-  }
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@9.15.3+sha256.c1da43727ccbc1ed42aff4fd6bdb4b1e91e65a818e6efff5b240fbf070ba4eaf"
 }
