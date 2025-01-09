@@ -47,10 +47,10 @@ describe('fetch entity statement chain', () => {
     })
 
     assert.strictEqual(chains.length, 1)
-    assert.strictEqual(chains[0]!.length, 2)
+    assert.strictEqual(chains[0]?.length, 2)
 
-    assert.deepStrictEqual(chains[0]![0], claims[0])
-    assert.deepStrictEqual(chains[0]![1], claims[1])
+    assert.deepStrictEqual(chains[0]?.[0], claims[0])
+    assert.deepStrictEqual(chains[0]?.[1], claims[1])
 
     const statements = await fetchEntityStatementChain({
       verifyJwtCallback,
@@ -59,11 +59,11 @@ describe('fetch entity statement chain', () => {
 
     assert.strictEqual(statements.length, 2)
 
-    assert.deepStrictEqual(statements[0]!.iss, trustAnchorEntityId)
-    assert.deepStrictEqual(statements[0]!.sub, leafEntityId)
+    assert.deepStrictEqual(statements[0]?.iss, trustAnchorEntityId)
+    assert.deepStrictEqual(statements[0]?.sub, leafEntityId)
 
-    assert.deepStrictEqual(statements[1]!.iss, trustAnchorEntityId)
-    assert.deepStrictEqual(statements[1]!.sub, trustAnchorEntityId)
+    assert.deepStrictEqual(statements[1]?.iss, trustAnchorEntityId)
+    assert.deepStrictEqual(statements[1]?.sub, trustAnchorEntityId)
 
     for (const scope of scopes) {
       scope.done()
@@ -113,11 +113,11 @@ describe('fetch entity statement chain', () => {
     })
 
     assert.strictEqual(chains.length, 1)
-    assert.strictEqual(chains[0]!.length, 3)
+    assert.strictEqual(chains[0]?.length, 3)
 
-    assert.deepStrictEqual(chains[0]![0], claims[0])
-    assert.deepStrictEqual(chains[0]![1], claims[1])
-    assert.deepStrictEqual(chains[0]![2], claims[2])
+    assert.deepStrictEqual(chains[0]?.[0], claims[0])
+    assert.deepStrictEqual(chains[0]?.[1], claims[1])
+    assert.deepStrictEqual(chains[0]?.[2], claims[2])
 
     const statements = await fetchEntityStatementChain({
       verifyJwtCallback,
@@ -126,14 +126,14 @@ describe('fetch entity statement chain', () => {
 
     assert.strictEqual(statements.length, 3)
 
-    assert.deepStrictEqual(statements[0]!.iss, intermediateEntityId)
-    assert.deepStrictEqual(statements[0]!.sub, leafEntityId)
+    assert.deepStrictEqual(statements[0]?.iss, intermediateEntityId)
+    assert.deepStrictEqual(statements[0]?.sub, leafEntityId)
 
-    assert.deepStrictEqual(statements[1]!.iss, trustAnchorEntityId)
-    assert.deepStrictEqual(statements[1]!.sub, intermediateEntityId)
+    assert.deepStrictEqual(statements[1]?.iss, trustAnchorEntityId)
+    assert.deepStrictEqual(statements[1]?.sub, intermediateEntityId)
 
-    assert.deepStrictEqual(statements[2]!.iss, trustAnchorEntityId)
-    assert.deepStrictEqual(statements[2]!.sub, trustAnchorEntityId)
+    assert.deepStrictEqual(statements[2]?.iss, trustAnchorEntityId)
+    assert.deepStrictEqual(statements[2]?.sub, trustAnchorEntityId)
 
     for (const scope of scopes) {
       scope.done()
@@ -175,10 +175,10 @@ describe('fetch entity statement chain', () => {
     })
 
     assert.strictEqual(chains.length, 1)
-    assert.strictEqual(chains[0]!.length, 2)
+    assert.strictEqual(chains[0]?.length, 2)
 
-    assert.deepStrictEqual(chains[0]![0], claims[0])
-    assert.deepStrictEqual(chains[0]![1], claims[1])
+    assert.deepStrictEqual(chains[0]?.[0], claims[0])
+    assert.deepStrictEqual(chains[0]?.[1], claims[1])
 
     await assert.rejects(
       fetchEntityStatementChain({

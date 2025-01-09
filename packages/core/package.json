@@ -3,24 +3,33 @@
   "version": "0.1.1-alpha.19",
   "description": "Core types and functionality of openid federation",
   "license": "Apache-2.0",
+  "exports": "./src/index.ts",
+  "files": ["dist"],
   "publishConfig": {
-    "access": "public"
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "import": "./dist/index.mjs",
+        "require": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      },
+      "./package.json": "./package.json"
+    }
   },
-  "main": "build/index.js",
-  "keywords": [],
   "author": "Animo Solutions",
   "scripts": {
-    "build": "tsc",
-    "test": "node --require ts-node/register --test __tests__/*.test.ts"
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean --sourcemap"
   },
   "dependencies": {
-    "buffer": "^6.0.3",
-    "zod": "^3.23.8"
+    "buffer": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "*",
-    "nock": "14.0.0-beta.7",
-    "ts-node": "*",
-    "typescript": "*"
+    "@types/node": "catalog:",
+    "nock": "catalog:",
+    "ts-node": "catalog:",
+    "typescript": "catalog:"
   }
 }

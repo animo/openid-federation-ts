@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
-    "outDir": "build",
-    "target": "es2016",
-    "lib": ["ES2021"],
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    "module": "Node16",
+    "target": "ES2020",
     "declaration": true,
     "sourceMap": true,
-    "noUncheckedIndexedAccess": true
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmitOnError": true,
+    "lib": ["ES2020"],
+    "types": ["node"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
-  "exclude": ["**/__tests__", "**/build"]
+  "exclude": ["**/build"]
 }

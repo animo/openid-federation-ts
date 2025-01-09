@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import nock from 'nock'
-import { EntityConfigurationClaimsOptions, fetchEntityConfigurationChains } from '../src/entityConfiguration'
+import { type EntityConfigurationClaimsOptions, fetchEntityConfigurationChains } from '../src/entityConfiguration'
 import type { SignCallback, VerifyCallback } from '../src/utils'
 import { setupConfigurationChain } from './utils/setupConfigurationChain'
 
@@ -37,10 +37,10 @@ describe('fetch entity configuration chains', () => {
     })
 
     assert.strictEqual(trustChains.length, 1)
-    assert.strictEqual(trustChains[0]!.length, 2)
+    assert.strictEqual(trustChains[0]?.length, 2)
 
-    assert.deepStrictEqual(trustChains[0]![0], claims[0])
-    assert.deepStrictEqual(trustChains[0]![1], claims[1])
+    assert.deepStrictEqual(trustChains[0]?.[0], claims[0])
+    assert.deepStrictEqual(trustChains[0]?.[1], claims[1])
 
     for (const scope of scopes) {
       scope.done()
@@ -83,11 +83,11 @@ describe('fetch entity configuration chains', () => {
     })
 
     assert.strictEqual(trustChains.length, 1)
-    assert.strictEqual(trustChains[0]!.length, 3)
+    assert.strictEqual(trustChains[0]?.length, 3)
 
-    assert.deepStrictEqual(trustChains[0]![0], claims[0])
-    assert.deepStrictEqual(trustChains[0]![1], claims[1])
-    assert.deepStrictEqual(trustChains[0]![2], claims[2])
+    assert.deepStrictEqual(trustChains[0]?.[0], claims[0])
+    assert.deepStrictEqual(trustChains[0]?.[1], claims[1])
+    assert.deepStrictEqual(trustChains[0]?.[2], claims[2])
 
     for (const scope of scopes) {
       scope.done()
@@ -130,10 +130,10 @@ describe('fetch entity configuration chains', () => {
     })
 
     assert.strictEqual(trustChains.length, 1)
-    assert.strictEqual(trustChains[0]!.length, 2)
+    assert.strictEqual(trustChains[0]?.length, 2)
 
-    assert.deepStrictEqual(trustChains[0]![0], claims[0])
-    assert.deepStrictEqual(trustChains[0]![1], claims[1])
+    assert.deepStrictEqual(trustChains[0]?.[0], claims[0])
+    assert.deepStrictEqual(trustChains[0]?.[1], claims[1])
 
     for (const scope of scopes) {
       scope.done()
@@ -186,8 +186,8 @@ describe('fetch entity configuration chains', () => {
     })
 
     assert.strictEqual(trustChains.length, 2)
-    assert.strictEqual(trustChains[0]!.length, 3)
-    assert.strictEqual(trustChains[1]!.length, 3)
+    assert.strictEqual(trustChains[0]?.length, 3)
+    assert.strictEqual(trustChains[1]?.length, 3)
 
     for (const scope of scopes) {
       scope.done()
@@ -240,7 +240,7 @@ describe('fetch entity configuration chains', () => {
     })
 
     assert.strictEqual(trustChains.length, 1)
-    assert.strictEqual(trustChains[0]!.length, 3)
+    assert.strictEqual(trustChains[0]?.length, 3)
 
     for (const scope of scopes) {
       scope.done()
@@ -262,7 +262,7 @@ describe('fetch entity configuration chains', () => {
 
     const trustChains = await fetchEntityConfigurationChains({
       verifyJwtCallback,
-      leafEntityId: configurations[0]!.entityId,
+      leafEntityId: configurations[0]?.entityId,
       trustAnchorEntityIds: ['https://trust.example.org'],
     })
 
@@ -306,7 +306,7 @@ describe('fetch entity configuration chains', () => {
 
     const trustChains = await fetchEntityConfigurationChains({
       verifyJwtCallback,
-      leafEntityId: configurations[0]!.entityId,
+      leafEntityId: configurations[0]?.entityId,
       trustAnchorEntityIds: [trustAnchorEntityId],
     })
 
