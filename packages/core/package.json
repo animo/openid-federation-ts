@@ -18,6 +18,12 @@
       "./package.json": "./package.json"
     }
   },
+  "homepage": "https://github.com/openwallet-foundation-labs/openid-federation-ts/tree/main/packages/core",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openwallet-foundation-labs/openid-federation-ts",
+    "directory": "packages/core"
+  },
   "author": "Animo Solutions",
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --clean --sourcemap"
