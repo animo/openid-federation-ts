@@ -33,7 +33,7 @@ export const metadataPolicySchema = z
       }
     )
   )
-  .passthrough()
+  .and(z.record(z.string(), z.any()))
   .superRefine((data, ctx) => {
     const dataKeys = Object.keys(data)
 

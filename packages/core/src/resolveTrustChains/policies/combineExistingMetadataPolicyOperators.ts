@@ -1,4 +1,4 @@
-import { type MetadataPolicyOperator, allSupportedPolicies } from '../../metadata'
+import { type MetadataPolicyOperator, allSupportedPolicies, isExistingPolicyKey } from '../../metadata'
 import { MetadataMergeStrategy } from '../../metadata/operator/MetadataMergeStrategy'
 import { objectToEntries } from '../../utils/data'
 import { PolicyOperatorMergeError } from './errors'
@@ -18,6 +18,9 @@ export function combineExistingMetadataPolicyOperators({
   const combinedPolicyRules = { ...existingPolicyRules }
 
   for (const [policyPropertyKey, policyRuleValue] of objectToEntries(newPolicyRules)) {
+    // When we don't know the policy key we can skip it because we already know it's not critical
+    if (!isExistingPolicyKey(policyPropertyKey)) continue
+
     if (!combinedPolicyRules[policyPropertyKey]) {
       combinedPolicyRules[policyPropertyKey] = policyRuleValue
       continue

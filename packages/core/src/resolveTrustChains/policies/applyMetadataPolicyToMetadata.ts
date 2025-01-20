@@ -2,7 +2,13 @@ import { objectToEntries } from '../../utils/data'
 
 import { cloneDeep } from '../../utils/data'
 
-import { type Metadata, type MetadataPolicyOperator, allSupportedPolicies } from '../../metadata'
+import {
+  type Metadata,
+  type MetadataPolicyOperator,
+  type SupportedPolicyKey,
+  allSupportedPolicies,
+  isExistingPolicyKey,
+} from '../../metadata'
 import { MetadataHelper } from './MetadataHelper'
 import { PolicyValidationError } from './errors/PolicyValidationError'
 import { type PolicyValue, union } from './utils'
@@ -15,10 +21,13 @@ export async function applyMetadataPolicyToMetadata({
 
   for (const [serviceKey, service] of objectToEntries(policyMetadata)) {
     for (const [servicePropertyKey, policyValue] of objectToEntries(service)) {
-      const policies = objectToEntries(policyValue).sort(
-        ([policyKeyA], [policyKeyB]) =>
-          allSupportedPolicies[policyKeyA].orderOfApplication - allSupportedPolicies[policyKeyB].orderOfApplication
-      )
+      const policies = objectToEntries(policyValue)
+        .filter(([key]) => isExistingPolicyKey(key))
+        .sort(
+          ([policyKeyA], [policyKeyB]) =>
+            allSupportedPolicies[policyKeyA as SupportedPolicyKey].orderOfApplication -
+            allSupportedPolicies[policyKeyB as SupportedPolicyKey].orderOfApplication
+        )
 
       const path = `${serviceKey}.${servicePropertyKey}`
 
@@ -41,10 +50,7 @@ export async function applyMetadataPolicyToMetadata({
             break
           }
           case 'one_of': {
-            const targetValue = resolvedLeafMetadata.getPropertyValue<string | number | boolean>(
-              serviceKey,
-              servicePropertyKey
-            )
+            const targetValue = resolvedLeafMetadata.getPropertyValue<PolicyValue>(serviceKey, servicePropertyKey)
             // With one_of it's allowed to not have a value and can be enforced with essential
             if (targetValue === undefined) break
 
@@ -95,7 +101,7 @@ export async function applyMetadataPolicyToMetadata({
             break
           }
           case 'superset_of': {
-            const targetValue = resolvedLeafMetadata.getPropertyValue(serviceKey, servicePropertyKey)
+            const targetValue = resolvedLeafMetadata.getPropertyValue<PolicyValue>(serviceKey, servicePropertyKey)
             if (!Array.isArray(targetValue))
               throw new PolicyValidationError('Cannot apply superset_of policy because the target is not an array', {
                 path,
@@ -120,7 +126,7 @@ export async function applyMetadataPolicyToMetadata({
           case 'essential': {
             if (!valueFromPolicy) break
 
-            const targetValue = resolvedLeafMetadata.getPropertyValue(serviceKey, servicePropertyKey)
+            const targetValue = resolvedLeafMetadata.getPropertyValue<PolicyValue>(serviceKey, servicePropertyKey)
             if (targetValue === undefined)
               throw new PolicyValidationError('The policy is required to have a value', {
                 path,
