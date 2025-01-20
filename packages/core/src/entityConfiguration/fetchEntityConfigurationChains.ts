@@ -1,5 +1,5 @@
-import { ErrorCode } from '../error/ErrorCode'
 import { OpenIdFederationError } from '../error/OpenIdFederationError'
+import { PolicyErrorStage } from '../error/PolicyErrorStage'
 import type { FetchCallback, VerifyCallback } from '../utils'
 import type { EntityConfigurationClaims } from './entityConfigurationClaims'
 import { fetchEntityConfiguration } from './fetchEntityConfiguration'
@@ -23,7 +23,7 @@ export const fetchEntityConfigurationChains = async (
 ): Promise<Array<Array<EntityConfigurationClaims>>> => {
   if (options.trustAnchorEntityIds.length === 0) {
     throw new OpenIdFederationError(
-      ErrorCode.Validation,
+      PolicyErrorStage.Validation,
       'Cannot establish a configuration chain for zero trust anchors'
     )
   }

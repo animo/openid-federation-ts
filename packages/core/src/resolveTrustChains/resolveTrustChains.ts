@@ -1,17 +1,16 @@
-// * Fetch the entity configurations, until the trust anchors are hit
-// * Fetch the entity statements back until the entityId is hit
-// * Merge and apply the policies, trickeling down
-// * Return a list of trust chains where the policies are applied, ending up at the `entityId` again
-// * Errors
-//    * when no trust anchor could be found
-//    * when no trust chain with valid applied could be found
-// resolveTrustChains(entityId: string, trustAnchorEntityIds: Array<string>) -> Promise<Array<TrustChain>>
-
 import { type fetchEntityConfiguration, fetchEntityConfigurationChains } from '../entityConfiguration'
 import { fetchEntityStatementChain } from '../entityStatement'
-import { ErrorCode } from '../error/ErrorCode'
 import { OpenIdFederationError } from '../error/OpenIdFederationError'
+import { PolicyErrorStage } from '../error/PolicyErrorStage'
 import type { VerifyCallback } from '../utils'
+import { tryCatch } from '../utils/tryCatch'
+import {
+  PolicyOperatorMergeError,
+  PolicyValidationError,
+  applyMetadataPolicyToMetadata,
+  combineMetadataPolicies,
+} from './policies'
+import { mergeMetadata } from './policies/utils'
 
 type Options = {
   verifyJwtCallback: VerifyCallback
@@ -19,17 +18,24 @@ type Options = {
   trustAnchorEntityIds: Array<string>
 }
 
-// TODO: Use more direct types instead of Awaited return types
+type leafEntityConfiguration = Awaited<ReturnType<typeof fetchEntityConfiguration>>
+
 type TrustChain = {
   chain: Awaited<ReturnType<typeof fetchEntityStatementChain>>
-  // TODO: Not sure if this needs to be the entity configuration with all the policies applied
-  leafEntityConfiguration: Awaited<ReturnType<typeof fetchEntityConfiguration>>
+  /**
+   * The raw leaf entity configuration before the policy is applied.
+   * So the metadata is not valid yet.
+   */
+  rawLeafEntityConfiguration: leafEntityConfiguration
+  /**
+   * The resolved leaf metadata after the policy is applied and the metadata is merged with the superior entity's metadata.
+   * This should be used to
+   */
+  resolvedLeafMetadata: leafEntityConfiguration['metadata']
   trustAnchorEntityConfiguration: Awaited<ReturnType<typeof fetchEntityConfiguration>>
 }
 
-// TODO: Apply the policies
-// TODO: Look into what we want to return in this function. Because the entity configuration is also very valuable
-// TODO: We might also need to return the entity configuration which has all the policies applied. So that a chain has both the statements and the configuration
+// TODO: Think about how we make this more open for debugging. Because when something goes wrong now in the policies it will be skipped but you can't really see what went wrong.
 
 /**
  * Resolves the trust chains for the given entityId and trust anchor entityIds.
@@ -59,24 +65,92 @@ export const resolveTrustChains = async (options: Options): Promise<Array<TrustC
 
     if (entityStatementChain.some((statement) => statement.exp < now)) {
       // Skip expired chains
+      // TODO: Think about how we want to share this conclusion with the caller
       continue
     }
 
-    // TODO: Merge all the policies and check them against the metadata of the leaf entity
+    if (entityStatementChain.length === 1) {
+      // When there is only one statement, we can assume that the leaf is also the trust anchor
+      const leafEntityConfiguration = entityConfigurationChain[0]
+      if (!leafEntityConfiguration)
+        throw new OpenIdFederationError(PolicyErrorStage.Validation, 'No leaf entity configuration found')
+
+      trustChains.push({
+        chain: entityStatementChain,
+        trustAnchorEntityConfiguration: leafEntityConfiguration,
+        rawLeafEntityConfiguration: leafEntityConfiguration,
+        resolvedLeafMetadata: leafEntityConfiguration.metadata,
+      })
+      continue
+    }
 
     const leafEntityConfiguration = entityConfigurationChain[0]
-    // Should never happen but for the type safety
     if (!leafEntityConfiguration)
-      throw new OpenIdFederationError(ErrorCode.Validation, 'No leaf entity configuration found')
+      throw new OpenIdFederationError(PolicyErrorStage.Validation, 'No leaf entity configuration found')
+
+    const statementsWithoutLeaf = entityStatementChain.slice(0, -1)
+    const combinedPolicyResult = await tryCatch(async () =>
+      combineMetadataPolicies({
+        statements: statementsWithoutLeaf,
+      })
+    )
+    if (!combinedPolicyResult.success) {
+      if (combinedPolicyResult.error instanceof PolicyOperatorMergeError) {
+        // When some operators can't be merged, we can declare the chain invalid
+        // TODO: Think about how we want to share this conclusion with the caller
+        continue
+      }
+      if (OpenIdFederationError.isMetadataPolicyCritError(combinedPolicyResult.error)) {
+        // When the error is a metadata_policy_crit error, we can declare the chain invalid
+        // TODO: Think about how we want to share this conclusion with the caller
+        continue
+      }
+
+      throw new OpenIdFederationError(
+        PolicyErrorStage.PolicyMerge,
+        'Unexpected error while applying policy',
+        combinedPolicyResult.error
+      )
+    }
+    const { mergedPolicy } = combinedPolicyResult.value
+
+    // When the superior entity has a metadata in it's statement we need to merge that first with the leaf metadata. Before applying the policy
+    const superiorEntityStatement = statementsWithoutLeaf[0]
+    const mergedLeafMetadata = mergeMetadata(
+      leafEntityConfiguration.metadata ?? {},
+      superiorEntityStatement?.metadata ?? {}
+    )
+
+    const policyApplyResult = await tryCatch(() =>
+      applyMetadataPolicyToMetadata({
+        leafMetadata: mergedLeafMetadata,
+        policyMetadata: mergedPolicy,
+      })
+    )
+    if (!policyApplyResult.success) {
+      if (policyApplyResult.error instanceof PolicyValidationError) {
+        // When the policy validation fails on the leaf metadata, we can declare the chain invalid
+        // TODO: Think about how we want to share this conclusion with the caller
+        continue
+      }
+
+      throw new OpenIdFederationError(
+        PolicyErrorStage.PolicyMerge,
+        'Unexpected error while applying policy',
+        policyApplyResult.error
+      )
+    }
+    const { resolvedLeafMetadata } = policyApplyResult.value
 
     const trustAnchorEntityConfiguration = entityConfigurationChain[entityConfigurationChain.length - 1]
     if (!trustAnchorEntityConfiguration)
-      throw new OpenIdFederationError(ErrorCode.Validation, 'No trust anchor entity configuration found')
+      throw new OpenIdFederationError(PolicyErrorStage.Validation, 'No trust anchor entity configuration found')
 
     trustChains.push({
       chain: entityStatementChain,
       trustAnchorEntityConfiguration,
-      leafEntityConfiguration,
+      rawLeafEntityConfiguration: leafEntityConfiguration,
+      resolvedLeafMetadata: resolvedLeafMetadata,
     })
   }
 

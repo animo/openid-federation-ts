@@ -15,7 +15,7 @@ export const entityStatementClaimsSchema = z
     jwks: jsonWebKeySetSchema,
     authority_hints: z.array(z.string().url()).optional(),
     metadata: metadataSchema.optional(),
-    metadata_policy: metadataPolicySchema.optional(),
+    metadata_policy: z.record(z.record(metadataPolicySchema.optional())).optional(),
     constraints: constraintSchema.optional(),
     crit: z.array(z.string()).optional(),
     metadata_policy_crit: z.array(z.string()).optional(),

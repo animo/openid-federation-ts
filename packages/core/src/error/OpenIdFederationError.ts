@@ -1,17 +1,20 @@
 import type { ZodError } from 'zod'
-import { ErrorCode } from './ErrorCode'
+import { PolicyErrorStage } from './PolicyErrorStage'
 
-// TODO: Extend to get more properties on the error
 export class OpenIdFederationError extends Error {
   public constructor(
-    public errorCode: ErrorCode,
+    public readonly errorCode: PolicyErrorStage,
     message?: string,
-    public context?: Error
+    public readonly cause?: unknown
   ) {
     super(message)
   }
 
   public static fromZodError(zodError: ZodError) {
-    return new OpenIdFederationError(ErrorCode.Validation, undefined, zodError)
+    return new OpenIdFederationError(PolicyErrorStage.Validation, undefined, zodError)
+  }
+
+  public static isMetadataPolicyCritError(error: unknown) {
+    return error instanceof OpenIdFederationError && error.errorCode === PolicyErrorStage.MetadataPolicyCrit
   }
 }
