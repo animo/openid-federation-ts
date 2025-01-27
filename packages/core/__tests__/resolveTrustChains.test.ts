@@ -666,4 +666,63 @@ describe('fetch trust chains', () => {
       },
     })
   })
+
+  it('should remove a property when a operator value is null', async () => {
+    const leafEntityId = 'https://leaff.example.org'
+    const trustAnchorEntityId = 'https://trust.example.org'
+
+    await setupConfigurationChain(
+      [
+        {
+          entityId: leafEntityId,
+          authorityHints: [trustAnchorEntityId],
+          claims: {
+            metadata: {
+              openid_relying_party: {
+                policy_uri: 'https://org.example.org/policy.html',
+
+                client_registration_types: ['automatic'],
+              },
+            },
+          },
+        },
+        {
+          entityId: trustAnchorEntityId,
+          subordinates: [
+            {
+              entityId: leafEntityId,
+              claims: {
+                metadata_policy: {
+                  openid_relying_party: {
+                    policy_uri: {
+                      value: null,
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+      ],
+      { signJwtCallback, mockEndpoints: true }
+    )
+
+    const trustChains = await resolveTrustChains({
+      entityId: leafEntityId,
+      trustAnchorEntityIds: [trustAnchorEntityId],
+      verifyJwtCallback,
+    })
+
+    assert.strictEqual(trustChains.length, 1)
+    assert.strictEqual(trustChains[0]?.chain.length, 2)
+
+    assert.deepStrictEqual(trustChains[0]?.resolvedLeafMetadata, {
+      federation_entity: {
+        federation_fetch_endpoint: 'https://leaff.example.org/fetch',
+      },
+      openid_relying_party: {
+        client_registration_types: ['automatic'],
+      },
+    })
+  })
 })

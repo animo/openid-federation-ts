@@ -34,6 +34,12 @@ export async function applyMetadataPolicyToMetadata({
       for (const [policyPropertyKey, valueFromPolicy] of policies) {
         switch (policyPropertyKey) {
           case 'value':
+            if (valueFromPolicy === null) {
+              // When the policy value is null, we delete the property
+              resolvedLeafMetadata.deleteProperty(serviceKey, servicePropertyKey)
+              break
+            }
+
             resolvedLeafMetadata.setPropertyValue(serviceKey, servicePropertyKey, valueFromPolicy)
             break
           case 'add': {

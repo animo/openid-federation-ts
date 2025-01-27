@@ -13,3 +13,6 @@ export function objectToEntries<
  * Creates a deep clone of an object
  */
 export const cloneDeep = <T>(obj: T): T => JSON.parse(JSON.stringify(obj))
+
+export const isNullOrUndefined = (value: unknown): value is null | undefined => value === null || value === undefined
+
