@@ -1,5 +1,5 @@
-import { type fetchEntityConfiguration, fetchEntityConfigurationChains } from '../entityConfiguration'
-import { fetchEntityStatementChain } from '../entityStatement'
+import { type EntityConfigurationClaims, fetchEntityConfigurationChains } from '../entityConfiguration'
+import { type EntityStatementChain, fetchEntityStatementChain } from '../entityStatement'
 import { OpenIdFederationError } from '../error/OpenIdFederationError'
 import { PolicyErrorStage } from '../error/PolicyErrorStage'
 import type { VerifyCallback } from '../utils'
@@ -18,21 +18,19 @@ type Options = {
   trustAnchorEntityIds: Array<string>
 }
 
-type leafEntityConfiguration = Awaited<ReturnType<typeof fetchEntityConfiguration>>
-
-type TrustChain = {
-  chain: Awaited<ReturnType<typeof fetchEntityStatementChain>>
+export type TrustChain = {
+  chain: EntityStatementChain
   /**
    * The raw leaf entity configuration before the policy is applied.
    * So the metadata is not valid yet.
    */
-  rawLeafEntityConfiguration: leafEntityConfiguration
+  rawLeafEntityConfiguration: EntityConfigurationClaims
   /**
    * The resolved leaf metadata after the policy is applied and the metadata is merged with the superior entity's metadata.
    * This should be used to
    */
-  resolvedLeafMetadata: leafEntityConfiguration['metadata']
-  trustAnchorEntityConfiguration: Awaited<ReturnType<typeof fetchEntityConfiguration>>
+  resolvedLeafMetadata: EntityConfigurationClaims['metadata']
+  trustAnchorEntityConfiguration: EntityConfigurationClaims
 }
 
 // TODO: Think about how we make this more open for debugging. Because when something goes wrong now in the policies it will be skipped but you can't really see what went wrong.
@@ -62,6 +60,7 @@ export const resolveTrustChains = async (options: Options): Promise<Array<TrustC
       entityConfigurations: entityConfigurationChain,
       verifyJwtCallback,
     })
+    if (entityStatementChain.length === 0) continue
 
     if (entityStatementChain.some((statement) => statement.exp < now)) {
       // Skip expired chains
@@ -69,11 +68,10 @@ export const resolveTrustChains = async (options: Options): Promise<Array<TrustC
       continue
     }
 
+    const leafEntityConfiguration = entityConfigurationChain[0]
+
     if (entityStatementChain.length === 1) {
       // When there is only one statement, we can assume that the leaf is also the trust anchor
-      const leafEntityConfiguration = entityConfigurationChain[0]
-      if (!leafEntityConfiguration)
-        throw new OpenIdFederationError(PolicyErrorStage.Validation, 'No leaf entity configuration found')
 
       trustChains.push({
         chain: entityStatementChain,
@@ -84,17 +82,14 @@ export const resolveTrustChains = async (options: Options): Promise<Array<TrustC
       continue
     }
 
-    const leafEntityConfiguration = entityConfigurationChain[0]
-    if (!leafEntityConfiguration)
-      throw new OpenIdFederationError(PolicyErrorStage.Validation, 'No leaf entity configuration found')
-
     const statementsWithoutLeaf = entityStatementChain.slice(0, -1)
-    const combinedPolicyResult = await tryCatch(async () =>
+    const combinedPolicyResult = tryCatch(() =>
       combineMetadataPolicies({
         statements: statementsWithoutLeaf,
       })
     )
     if (!combinedPolicyResult.success) {
+      // TODO: In this function we can make conclusions they all now continue but at some point they should be reflected back to the caller
       if (combinedPolicyResult.error instanceof PolicyOperatorMergeError) {
         // When some operators can't be merged, we can declare the chain invalid
         // TODO: Think about how we want to share this conclusion with the caller
@@ -106,11 +101,9 @@ export const resolveTrustChains = async (options: Options): Promise<Array<TrustC
         continue
       }
 
-      throw new OpenIdFederationError(
-        PolicyErrorStage.PolicyMerge,
-        'Unexpected error while applying policy',
-        combinedPolicyResult.error
-      )
+      // An unexpected error occurred while combining the policies
+      // TODO: Think about how we want to share this conclusion with the caller
+      continue
     }
     const { mergedPolicy } = combinedPolicyResult.value
 
@@ -121,29 +114,29 @@ export const resolveTrustChains = async (options: Options): Promise<Array<TrustC
       superiorEntityStatement?.metadata ?? {}
     )
 
-    const policyApplyResult = await tryCatch(() =>
+    const policyApplyResult = tryCatch(() =>
       applyMetadataPolicyToMetadata({
         leafMetadata: mergedLeafMetadata,
         policyMetadata: mergedPolicy,
       })
     )
     if (!policyApplyResult.success) {
+      // TODO: In this function we can make conclusions they all now continue but at some point they should be reflected back to the caller
       if (policyApplyResult.error instanceof PolicyValidationError) {
         // When the policy validation fails on the leaf metadata, we can declare the chain invalid
         // TODO: Think about how we want to share this conclusion with the caller
         continue
       }
 
-      throw new OpenIdFederationError(
-        PolicyErrorStage.PolicyMerge,
-        'Unexpected error while applying policy',
-        policyApplyResult.error
-      )
+      // An unexpected error occurred while applying the policy
+      // TODO: Think about how we want to share this conclusion with the caller
+      continue
     }
     const { resolvedLeafMetadata } = policyApplyResult.value
 
     const trustAnchorEntityConfiguration = entityConfigurationChain[entityConfigurationChain.length - 1]
     if (!trustAnchorEntityConfiguration)
+      // Should never fail
       throw new OpenIdFederationError(PolicyErrorStage.Validation, 'No trust anchor entity configuration found')
 
     trustChains.push({

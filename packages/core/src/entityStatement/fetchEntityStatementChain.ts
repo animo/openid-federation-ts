@@ -10,10 +10,12 @@ export type FetchEntityStatementChainOptions = {
   verifyJwtCallback: VerifyCallback
 }
 
+export type EntityStatementChain = Array<EntityStatementClaims>
+
 export const fetchEntityStatementChain = async ({
   verifyJwtCallback,
   entityConfigurations,
-}: FetchEntityStatementChainOptions): Promise<Array<EntityStatementClaims>> => {
+}: FetchEntityStatementChainOptions): Promise<EntityStatementChain> => {
   if (entityConfigurations.length === 0) {
     throw new OpenIdFederationError(
       PolicyErrorStage.Validation,

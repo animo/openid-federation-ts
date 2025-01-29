@@ -100,7 +100,7 @@ export function combineExistingMetadataPolicyOperators({
             operatorB: newPolicyRules,
           })
         }
-        combinedPolicyRules[policyPropertyKey] = existingPolicyRuleValue || newPolicyRuleValue
+        combinedPolicyRules[policyPropertyKey] = existingPolicyRuleValue ?? newPolicyRuleValue
         break
 
       default:

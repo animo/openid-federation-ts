@@ -1,12 +1,11 @@
-import { objectToEntries } from '../../utils/data'
+import { immutable, objectToEntries } from '../../utils/data'
 
 import type { Metadata } from '../../metadata'
-import { cloneDeep } from '../../utils/data'
 import { MetadataHelper } from './MetadataHelper'
 
 export type PolicyValue = boolean | string | number
 
-type PolicyValueArray = (boolean | string | number)[]
+export type PolicyValueArray = PolicyValue[]
 
 export function intersect(operator1: PolicyValueArray, operator2: PolicyValueArray) {
   const set1 = new Set(operator1)
@@ -24,7 +23,7 @@ export function union(operator1: PolicyValueArray, operator2: PolicyValueArray) 
  * The superior always has the highest priority
  */
 export function mergeMetadata(leafConfigMetadata: Metadata, superiorEntityStatement: Metadata): Metadata {
-  const mergedLeafMetadata = new MetadataHelper(cloneDeep(leafConfigMetadata))
+  const mergedLeafMetadata = new MetadataHelper(immutable(leafConfigMetadata))
 
   for (const [entityType, entityConfigMetadata] of objectToEntries(superiorEntityStatement)) {
     for (const [key, value] of objectToEntries(entityConfigMetadata)) {
@@ -32,5 +31,5 @@ export function mergeMetadata(leafConfigMetadata: Metadata, superiorEntityStatem
     }
   }
 
-  return mergedLeafMetadata.metadata
+  return mergedLeafMetadata.asMetadata()
 }

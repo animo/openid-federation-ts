@@ -1,9 +1,21 @@
-export async function tryCatch<T>(
-  fn: () => Promise<T>
-): Promise<{ success: true; value: T } | { success: false; error: unknown }> {
+type Result<T> = { success: true; value: T } | { success: false; error: unknown }
+
+export function tryCatch<TReturn>(
+  fn: () => TReturn
+): TReturn extends Promise<infer T> ? Promise<Result<T>> : Result<TReturn> {
   try {
-    return { success: true, value: await fn() } as const
+    const result = fn()
+
+    if (result instanceof Promise) {
+      return result
+        .then((value) => ({ success: true, value }) as const)
+        .catch((error: unknown) => ({ success: false, error }) as const) as TReturn extends Promise<infer T>
+        ? Promise<Result<T>>
+        : never
+    }
+
+    return { success: true, value: result } as TReturn extends Promise<infer T> ? Promise<Result<T>> : Result<TReturn>
   } catch (error) {
-    return { success: false, error } as const
+    return { success: false, error } as TReturn extends Promise<infer T> ? Promise<Result<T>> : Result<TReturn>
   }
 }

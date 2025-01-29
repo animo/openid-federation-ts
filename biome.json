@@ -42,6 +42,10 @@
       "style": {
         "useNodeAssertStrict": { "level": "error", "fix": "unsafe" },
         "useNodejsImportProtocol": { "level": "off" }
+      },
+      "correctness": {
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error"
       }
     }
   },

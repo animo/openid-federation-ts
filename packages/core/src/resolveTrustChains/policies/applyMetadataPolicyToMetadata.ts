@@ -1,6 +1,4 @@
-import { objectToEntries } from '../../utils/data'
-
-import { cloneDeep } from '../../utils/data'
+import { immutable, isNullOrUndefined, objectToEntries } from '../../utils/data'
 
 import {
   type Metadata,
@@ -13,11 +11,11 @@ import { MetadataHelper } from './MetadataHelper'
 import { PolicyValidationError } from './errors/PolicyValidationError'
 import { type PolicyValue, union } from './utils'
 
-export async function applyMetadataPolicyToMetadata({
+export function applyMetadataPolicyToMetadata({
   leafMetadata,
   policyMetadata,
 }: { leafMetadata: Metadata; policyMetadata: Record<string, Record<string, MetadataPolicyOperator>> }) {
-  const resolvedLeafMetadata = new MetadataHelper(cloneDeep(leafMetadata))
+  const resolvedLeafMetadata = new MetadataHelper(immutable(leafMetadata))
 
   for (const [serviceKey, service] of objectToEntries(policyMetadata)) {
     for (const [servicePropertyKey, policyValue] of objectToEntries(service)) {
@@ -58,7 +56,7 @@ export async function applyMetadataPolicyToMetadata({
           case 'one_of': {
             const targetValue = resolvedLeafMetadata.getPropertyValue<PolicyValue>(serviceKey, servicePropertyKey)
             // With one_of it's allowed to not have a value and can be enforced with essential
-            if (targetValue === undefined) break
+            if (isNullOrUndefined(targetValue)) break
 
             if (!Array.isArray(valueFromPolicy))
               throw new PolicyValidationError('Cannot apply one_of policy because the value is not an array', {
@@ -133,7 +131,7 @@ export async function applyMetadataPolicyToMetadata({
             if (!valueFromPolicy) break
 
             const targetValue = resolvedLeafMetadata.getPropertyValue<PolicyValue>(serviceKey, servicePropertyKey)
-            if (targetValue === undefined)
+            if (isNullOrUndefined(targetValue))
               throw new PolicyValidationError('The policy is required to have a value', {
                 path,
                 policyValue: valueFromPolicy,
@@ -154,6 +152,6 @@ export async function applyMetadataPolicyToMetadata({
   }
 
   return {
-    resolvedLeafMetadata: resolvedLeafMetadata.metadata,
+    resolvedLeafMetadata: resolvedLeafMetadata.asMetadata(),
   }
 }

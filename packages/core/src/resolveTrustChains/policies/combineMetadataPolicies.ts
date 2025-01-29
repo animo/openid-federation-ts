@@ -1,11 +1,11 @@
 import type { EntityStatementClaims } from '../../entityStatement'
 import { OpenIdFederationError } from '../../error/OpenIdFederationError'
 import { PolicyErrorStage } from '../../error/PolicyErrorStage'
-import { type MetadataPolicyOperator, isExistingPolicyKey, metadataPolicySchema } from '../../metadata'
+import { isExistingPolicyKey, metadataPolicySchema } from '../../metadata'
+import type { MetadataPolicy } from '../../metadata/metadataPolicy'
 import { objectToEntries } from '../../utils/data'
+import { MetadataHelper } from './MetadataHelper'
 import { combineExistingMetadataPolicyOperators } from './combineExistingMetadataPolicyOperators'
-
-type MetadataPolicy = Record<string, Record<string, MetadataPolicyOperator>>
 
 export function combineMetadataPolicies({
   statements,
@@ -17,8 +17,8 @@ export function combineMetadataPolicies({
 }): {
   mergedPolicy: MetadataPolicy
 } {
-  if (statements.length === 0) throw new Error('Chain is empty')
-  const mergedPolicyMap: MetadataPolicy = {}
+  if (statements.length === 0) throw new OpenIdFederationError(PolicyErrorStage.Generic, 'Chain is empty')
+  const mergedPolicyMap = new MetadataHelper({})
 
   // We start from the TA and go down to the intermediate
   for (let i = statements.length - 1; i >= 0; i--) {
@@ -49,12 +49,10 @@ export function combineMetadataPolicies({
           }
         }
 
-        const target = mergedPolicyMap[serviceKey]
-        const existingPolicyRule = target?.[servicePropertyKey]
+        const existingPolicyRule = mergedPolicyMap.getPropertyValue(serviceKey, servicePropertyKey)
         if (!existingPolicyRule) {
           // When there is no existing policy rule yet we can set the new policy rule
-          mergedPolicyMap[serviceKey] ??= {}
-          mergedPolicyMap[serviceKey][servicePropertyKey] = newPolicyRules
+          mergedPolicyMap.setPropertyValue(serviceKey, servicePropertyKey, newPolicyRules)
           continue
         }
 
@@ -70,13 +68,12 @@ export function combineMetadataPolicies({
         const combinedPolicyRules = metadataPolicySchema.safeParse(combinedPolicyRulesRaw)
         if (!combinedPolicyRules.success) throw combinedPolicyRules.error
 
-        mergedPolicyMap[serviceKey] ??= {}
-        mergedPolicyMap[serviceKey][servicePropertyKey] = combinedPolicyRules.data
+        mergedPolicyMap.setPropertyValue(serviceKey, servicePropertyKey, combinedPolicyRules.data)
       }
     }
   }
 
   return {
-    mergedPolicy: mergedPolicyMap,
+    mergedPolicy: mergedPolicyMap.asMetadataPolicy(),
   }
 }

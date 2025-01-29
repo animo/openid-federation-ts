@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { type EntityConfigurationClaimsOptions, fetchEntityConfigurationChains } from '../src/entityConfiguration'
 import { resolveTrustChains } from '../src/resolveTrustChains'
 import type { SignCallback, VerifyCallback } from '../src/utils'
 import { setupConfigurationChain } from './utils/setupConfigurationChain'
@@ -40,7 +39,7 @@ describe('fetch trust chains', () => {
     const intermediateEntityId = 'https://intermediate.example.org'
     const trustAnchorEntityId = 'https://trust.example.org'
 
-    const { chainData: configurations, nockScopes } = await setupConfigurationChain(
+    const { nockScopes } = await setupConfigurationChain(
       [
         { entityId: leafEntityId, authorityHints: [intermediateEntityId] },
         {
@@ -51,10 +50,6 @@ describe('fetch trust chains', () => {
         { entityId: trustAnchorEntityId, subordinates: [intermediateEntityId] },
       ],
       { signJwtCallback, mockEndpoints: true }
-    )
-
-    const claims: Array<EntityConfigurationClaimsOptions> = configurations.map(
-      ({ claims: configurationClaims }) => configurationClaims
     )
 
     const trustChains = await resolveTrustChains({
@@ -80,7 +75,7 @@ describe('fetch trust chains', () => {
     const intermediateEntityId = 'https://intermediate.example.org'
     const trustAnchorEntityId = 'https://trust.example.org'
 
-    const { chainData: configurations, nockScopes } = await setupConfigurationChain(
+    const { nockScopes } = await setupConfigurationChain(
       [
         { entityId: leafEntityId, authorityHints: [intermediateEntityId] },
         {
@@ -108,10 +103,6 @@ describe('fetch trust chains', () => {
         { entityId: trustAnchorEntityId, subordinates: [intermediateEntityId] },
       ],
       { signJwtCallback, mockEndpoints: true }
-    )
-
-    const claims: Array<EntityConfigurationClaimsOptions> = configurations.map(
-      ({ claims: configurationClaims }) => configurationClaims
     )
 
     const trustChains = await resolveTrustChains({
@@ -179,7 +170,7 @@ describe('fetch trust chains', () => {
     const trustAnchorOneEntityId = 'https://trust.one.example.org'
     const trustAnchorTwoEntityId = 'https://trust.two.example.org'
 
-    const { chainData: configurations, nockScopes } = await setupConfigurationChain(
+    await setupConfigurationChain(
       [
         {
           entityId: leafEntityId,

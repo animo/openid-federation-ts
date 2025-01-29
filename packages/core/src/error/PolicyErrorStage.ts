@@ -1,7 +1,7 @@
 export enum PolicyErrorStage {
-  Generic = 0,
-  Validation = 1,
-  MetadataPolicyCrit = 2,
-  PolicyMerge = 3,
-  PolicyApply = 4,
+  Generic = 'generic',
+  Validation = 'validation',
+  MetadataPolicyCrit = 'metadataPolicyCrit',
+  PolicyMerge = 'policyMerge',
+  PolicyApply = 'policyApply',
 }
