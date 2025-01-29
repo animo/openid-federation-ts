@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { type EntityConfigurationClaimsOptions, fetchEntityConfigurationChains } from '../src/entityConfiguration'
+import { fetchEntityConfigurationChains } from '../src/entityConfiguration'
 import { fetchEntityStatementChain } from '../src/entityStatement'
 import type { SignCallback, VerifyCallback } from '../src/utils'
 import { setupConfigurationChain } from './utils/setupConfigurationChain'
@@ -55,8 +55,6 @@ describe('fetch entity statement chain', () => {
     const leafEntityId = 'https://leaf.example.org'
     const intermediateEntityId = 'https://intermediate.example.org'
     const trustAnchorEntityId = 'https://trust.example.org'
-
-    const claims: Array<EntityConfigurationClaimsOptions> = []
 
     const { chainData: configurations, nockScopes } = await setupConfigurationChain(
       [

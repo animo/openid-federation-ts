@@ -152,7 +152,7 @@ describe('fetch entity configuration chains', () => {
     const trustAnchorOneEntityId = 'https://trust.one.example.org'
     const trustAnchorTwoEntityId = 'https://trust.two.example.org'
 
-    const { chainData: configurations, nockScopes } = await setupConfigurationChain(
+    const { nockScopes } = await setupConfigurationChain(
       [
         {
           entityId: leafEntityId,
