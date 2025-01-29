@@ -37,6 +37,10 @@ export const setupConfigurationChain = async <MockEndpoints extends boolean>(
     mockEndpoints?: MockEndpoints
   }
 ) => {
+  if (mockEndpoints) {
+    nock.cleanAll()
+  }
+
   const chainData: Array<{
     claims: EntityConfigurationClaimsOptions
     jwt: string

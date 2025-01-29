@@ -716,4 +716,280 @@ describe('fetch trust chains', () => {
       },
     })
   })
+
+  it('should handle multiple value operators in the same chain', async () => {
+    const leafEntityId = 'https://leaff.example.org'
+    const intermediateEntityId = 'https://intermediate.example.org'
+    const trustAnchorEntityId = 'https://trust.example.org'
+
+    await setupConfigurationChain(
+      [
+        {
+          entityId: leafEntityId,
+          authorityHints: [intermediateEntityId],
+          claims: {
+            metadata: {
+              openid_relying_party: {
+                policy_uri: 'https://leaf.example.org/policy.html',
+                tos_uri: 'https://leaf.example.org/tos.html',
+                logo_uri: 'https://leaf.example.org/logo.png',
+                client_registration_types: ['automatic'],
+              },
+            },
+          },
+        },
+        {
+          entityId: intermediateEntityId,
+          authorityHints: [trustAnchorEntityId],
+          subordinates: [
+            {
+              entityId: leafEntityId,
+              claims: {
+                metadata_policy: {
+                  openid_relying_party: {
+                    policy_uri: {
+                      value: 'https://intermediate.example.org/policy.html',
+                    },
+                    tos_uri: {
+                      value: null,
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+        {
+          entityId: trustAnchorEntityId,
+          subordinates: [
+            {
+              entityId: intermediateEntityId,
+              claims: {
+                metadata_policy: {
+                  openid_relying_party: {
+                    logo_uri: {
+                      value: 'https://trust.example.org/logo.png',
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+      ],
+      { signJwtCallback, mockEndpoints: true }
+    )
+
+    const trustChains = await resolveTrustChains({
+      entityId: leafEntityId,
+      trustAnchorEntityIds: [trustAnchorEntityId],
+      verifyJwtCallback,
+    })
+
+    assert.strictEqual(trustChains.length, 1)
+    assert.strictEqual(trustChains[0]?.chain.length, 3)
+
+    assert.deepStrictEqual(trustChains[0]?.resolvedLeafMetadata, {
+      federation_entity: {
+        federation_fetch_endpoint: 'https://leaff.example.org/fetch',
+      },
+      openid_relying_party: {
+        policy_uri: 'https://intermediate.example.org/policy.html',
+        logo_uri: 'https://trust.example.org/logo.png',
+        client_registration_types: ['automatic'],
+      },
+    })
+  })
+
+  it('should handle complex array operations in metadata policy', async () => {
+    const leafEntityId = 'https://leaff.example.org'
+    const trustAnchorEntityId = 'https://trust.example.org'
+
+    await setupConfigurationChain(
+      [
+        {
+          entityId: leafEntityId,
+          authorityHints: [trustAnchorEntityId],
+          claims: {
+            metadata: {
+              openid_relying_party: {
+                grant_types: ['authorization_code', 'refresh_token', 'client_credentials'],
+                response_types: ['code', 'code id_token'],
+                client_registration_types: ['automatic'],
+              },
+            },
+          },
+        },
+        {
+          entityId: trustAnchorEntityId,
+          subordinates: [
+            {
+              entityId: leafEntityId,
+              claims: {
+                metadata_policy: {
+                  openid_relying_party: {
+                    grant_types: {
+                      subset_of: ['authorization_code', 'refresh_token'],
+                    },
+                    response_types: {
+                      subset_of: ['code'],
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+      ],
+      { signJwtCallback, mockEndpoints: true }
+    )
+
+    const trustChains = await resolveTrustChains({
+      entityId: leafEntityId,
+      trustAnchorEntityIds: [trustAnchorEntityId],
+      verifyJwtCallback,
+    })
+
+    assert.strictEqual(trustChains.length, 1)
+    assert.strictEqual(trustChains[0]?.chain.length, 2)
+
+    assert.deepStrictEqual(trustChains[0]?.resolvedLeafMetadata, {
+      federation_entity: {
+        federation_fetch_endpoint: 'https://leaff.example.org/fetch',
+      },
+      openid_relying_party: {
+        grant_types: ['authorization_code', 'refresh_token'],
+        response_types: ['code'],
+        client_registration_types: ['automatic'],
+      },
+    })
+  })
+
+  it('should handle order of value and  essential properties in metadata policy', async () => {
+    const leafEntityId = 'https://leaff.example.org'
+    const trustAnchorEntityId = 'https://trust.example.org'
+
+    await setupConfigurationChain(
+      [
+        {
+          entityId: leafEntityId,
+          authorityHints: [trustAnchorEntityId],
+          claims: {
+            metadata: {
+              openid_relying_party: {
+                client_registration_types: ['automatic'],
+                // Missing required token_endpoint_auth_method
+              },
+            },
+          },
+        },
+        {
+          entityId: trustAnchorEntityId,
+          subordinates: [
+            {
+              entityId: leafEntityId,
+              claims: {
+                metadata_policy: {
+                  openid_relying_party: {
+                    token_endpoint_auth_method: {
+                      value: 'private_key_jwt',
+                      essential: true,
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+      ],
+      { signJwtCallback, mockEndpoints: true }
+    )
+
+    const trustChains = await resolveTrustChains({
+      entityId: leafEntityId,
+      trustAnchorEntityIds: [trustAnchorEntityId],
+      verifyJwtCallback,
+    })
+
+    // Should succeed because the value is set by the trust anchor
+    assert.strictEqual(trustChains.length, 1)
+  })
+
+  it('should handle combining multiple array operators across chain', async () => {
+    const leafEntityId = 'https://leaff.example.org'
+    const intermediateEntityId = 'https://intermediate.example.org'
+    const trustAnchorEntityId = 'https://trust.example.org'
+
+    await setupConfigurationChain(
+      [
+        {
+          entityId: leafEntityId,
+          authorityHints: [intermediateEntityId],
+          claims: {
+            metadata: {
+              openid_relying_party: {
+                grant_types: ['authorization_code'],
+                client_registration_types: ['automatic'],
+              },
+            },
+          },
+        },
+        {
+          entityId: intermediateEntityId,
+          authorityHints: [trustAnchorEntityId],
+          subordinates: [
+            {
+              entityId: leafEntityId,
+              claims: {
+                metadata_policy: {
+                  openid_relying_party: {
+                    grant_types: {
+                      add: ['authorization_code', 'refresh_token', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+        {
+          entityId: trustAnchorEntityId,
+          subordinates: [
+            {
+              entityId: intermediateEntityId,
+              claims: {
+                metadata_policy: {
+                  openid_relying_party: {
+                    grant_types: {
+                      subset_of: ['authorization_code', 'refresh_token', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+      ],
+      { signJwtCallback, mockEndpoints: true }
+    )
+
+    const trustChains = await resolveTrustChains({
+      entityId: leafEntityId,
+      trustAnchorEntityIds: [trustAnchorEntityId],
+      verifyJwtCallback,
+    })
+
+    assert.strictEqual(trustChains.length, 1)
+    assert.strictEqual(trustChains[0]?.chain.length, 3)
+
+    assert.deepStrictEqual(trustChains[0]?.resolvedLeafMetadata, {
+      federation_entity: {
+        federation_fetch_endpoint: 'https://leaff.example.org/fetch',
+      },
+      openid_relying_party: {
+        client_registration_types: ['automatic'],
+        grant_types: ['authorization_code', 'refresh_token', 'urn:ietf:params:oauth:grant-type:jwt-bearer'],
+      },
+    })
+  })
 })

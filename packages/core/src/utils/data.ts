@@ -15,9 +15,18 @@ export const immutable = <T extends object>(obj: T): T =>
   new Proxy(obj, {
     get(target: T, prop: string | symbol) {
       const value = target[prop as keyof T]
-      return typeof value === 'object' && value !== null ? immutable(value) : value
+      return typeof value === 'object' && value !== null
+        ? Array.isArray(value)
+          ? Object.freeze(
+              [...value].map((item) => (typeof item === 'object' && item !== null ? immutable(item) : item))
+            )
+          : immutable(value)
+        : value
     },
     set() {
+      throw new Error('This object is immutable.')
+    },
+    deleteProperty() {
       throw new Error('This object is immutable.')
     },
   })
