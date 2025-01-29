@@ -19,6 +19,11 @@ type Options = {
 }
 
 export type TrustChain = {
+  /**
+   * Later this will give us the ability to provide the failed chains to the caller
+   */
+  valid: true
+
   chain: EntityStatementChain
   /**
    * The raw leaf entity configuration before the policy is applied.
@@ -74,6 +79,7 @@ export const resolveTrustChains = async (options: Options): Promise<Array<TrustC
       // When there is only one statement, we can assume that the leaf is also the trust anchor
 
       trustChains.push({
+        valid: true,
         chain: entityStatementChain,
         trustAnchorEntityConfiguration: leafEntityConfiguration,
         rawLeafEntityConfiguration: leafEntityConfiguration,
@@ -140,6 +146,7 @@ export const resolveTrustChains = async (options: Options): Promise<Array<TrustC
       throw new OpenIdFederationError(PolicyErrorStage.Validation, 'No trust anchor entity configuration found')
 
     trustChains.push({
+      valid: true,
       chain: entityStatementChain,
       trustAnchorEntityConfiguration,
       rawLeafEntityConfiguration: leafEntityConfiguration,
