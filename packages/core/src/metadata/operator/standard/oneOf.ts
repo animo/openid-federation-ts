@@ -5,7 +5,12 @@ import { createPolicyOperatorSchema } from '../utils'
 
 export const oneOfOperator = createPolicyOperatorSchema({
   key: 'one_of',
-  parameterJsonValues: [z.string(), z.record(z.string().or(z.number()), z.unknown()), z.number()],
+  parameterJsonValues: [
+    z.string(),
+    // TODO: See how we want to we handle the comparison of objects
+    // z.record(z.string().or(z.number()), z.unknown()),
+    z.number(),
+  ],
   operatorJsonValues: [
     z.array(z.string()),
     // TODO: See how we want to we handle the comparison of objects

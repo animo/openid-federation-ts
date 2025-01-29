@@ -7,7 +7,8 @@ export const supersetOfOperator = createPolicyOperatorSchema({
   key: 'superset_of',
   parameterJsonValues: [
     z.array(z.string()),
-    z.array(z.record(z.string().or(z.number()), z.unknown())),
+    // TODO: See how we want to we handle the comparison of objects
+    // z.array(z.record(z.string().or(z.number()), z.unknown())),
     z.array(z.number()),
   ],
   operatorJsonValues: [
