@@ -1,6 +1,8 @@
 name: Continuous Integration
 
 on:
+  pull_request_review:
+
   pull_request:
     branches:
       - main
@@ -10,6 +12,7 @@ on:
 
 jobs:
   validate:
+    if: github.event_name != 'pull_request_review' ||  github.event.pull_request.head.ref == 'changeset-release/main'
     runs-on: ubuntu-20.04
     name: Validate
     steps:
@@ -20,7 +23,7 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: "pnpm"
 
       - name: Install dependencies
@@ -36,13 +39,14 @@ jobs:
         run: pnpm build
 
   tests:
+    if: github.event_name != 'pull_request_review' ||  github.event.pull_request.head.ref == 'changeset-release/main'
     runs-on: ubuntu-20.04
     name: Tests
 
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18, 20]
+        node-version: [18, 20, 22]
 
     steps:
       - name: Checkout Repo
