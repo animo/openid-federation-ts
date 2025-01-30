@@ -1,10 +1,9 @@
 import { z } from 'zod'
 import { MetadataMergeStrategy } from '../MetadataMergeStrategy'
-import type { MetadataOperator } from '../MetadataOperator'
 import { MetadataOrderOfApplication } from '../MetadataOrderOfApplication'
 import { createPolicyOperatorSchema } from '../utils'
 
-export const defaultOperator: MetadataOperator = {
+export const defaultOperator = createPolicyOperatorSchema({
   key: 'default',
   parameterJsonValues: [
     z.string(),
@@ -23,6 +22,4 @@ export const defaultOperator: MetadataOperator = {
   canBeCombinedWith: ['add', 'one_of', 'subset_of', 'superset_of', 'essential'],
   orderOfApplication: MetadataOrderOfApplication.AfterAdd,
   mergeStrategy: MetadataMergeStrategy.OperatorValuesEqual,
-}
-
-export const defaultOperatorSchema = createPolicyOperatorSchema(defaultOperator)
+})

@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import nock from 'nock'
-import { type EntityConfigurationClaimsOptions, fetchEntityConfigurationChains } from '../src/entityConfiguration'
+import { fetchEntityConfigurationChains } from '../src/entityConfiguration'
 import type { SignCallback, VerifyCallback } from '../src/utils'
 import { setupConfigurationChain } from './utils/setupConfigurationChain'
 
@@ -13,22 +12,10 @@ describe('fetch entity configuration chains', () => {
     const leafEntityId = 'https://leaf.example.org'
     const trustAnchorEntityId = 'https://trust.example.org'
 
-    const scopes: Array<nock.Scope> = []
-    const claims: Array<EntityConfigurationClaimsOptions> = []
-
-    const configurations = await setupConfigurationChain(
+    const { chainData: configurations, nockScopes } = await setupConfigurationChain(
       [{ entityId: leafEntityId, authorityHints: [trustAnchorEntityId] }, { entityId: trustAnchorEntityId }],
-      signJwtCallback
+      { signJwtCallback, mockEndpoints: true }
     )
-
-    for (const { entityId, jwt, claims: configurationClaims } of configurations) {
-      const scope = nock(entityId).get('/.well-known/openid-federation').reply(200, jwt, {
-        'content-type': 'application/entity-statement+jwt',
-      })
-
-      scopes.push(scope)
-      claims.push(configurationClaims)
-    }
 
     const trustChains = await fetchEntityConfigurationChains({
       verifyJwtCallback,
@@ -39,10 +26,10 @@ describe('fetch entity configuration chains', () => {
     assert.strictEqual(trustChains.length, 1)
     assert.strictEqual(trustChains[0]?.length, 2)
 
-    assert.deepStrictEqual(trustChains[0]?.[0], claims[0])
-    assert.deepStrictEqual(trustChains[0]?.[1], claims[1])
+    assert.deepStrictEqual(trustChains[0]?.[0], configurations[0]?.claims)
+    assert.deepStrictEqual(trustChains[0]?.[1], configurations[1]?.claims)
 
-    for (const scope of scopes) {
+    for (const scope of nockScopes) {
       scope.done()
     }
   })
@@ -52,10 +39,7 @@ describe('fetch entity configuration chains', () => {
     const intermediateEntityId = 'https://intermediate.example.org'
     const trustAnchorEntityId = 'https://trust.example.org'
 
-    const scopes: Array<nock.Scope> = []
-    const claims: Array<EntityConfigurationClaimsOptions> = []
-
-    const configurations = await setupConfigurationChain(
+    const { chainData: configurations, nockScopes } = await setupConfigurationChain(
       [
         { entityId: leafEntityId, authorityHints: [intermediateEntityId] },
         {
@@ -64,17 +48,8 @@ describe('fetch entity configuration chains', () => {
         },
         { entityId: trustAnchorEntityId },
       ],
-      signJwtCallback
+      { signJwtCallback, mockEndpoints: true }
     )
-
-    for (const { entityId, jwt, claims: configurationClaims } of configurations) {
-      const scope = nock(entityId).get('/.well-known/openid-federation').reply(200, jwt, {
-        'content-type': 'application/entity-statement+jwt',
-      })
-
-      scopes.push(scope)
-      claims.push(configurationClaims)
-    }
 
     const trustChains = await fetchEntityConfigurationChains({
       verifyJwtCallback,
@@ -85,11 +60,11 @@ describe('fetch entity configuration chains', () => {
     assert.strictEqual(trustChains.length, 1)
     assert.strictEqual(trustChains[0]?.length, 3)
 
-    assert.deepStrictEqual(trustChains[0]?.[0], claims[0])
-    assert.deepStrictEqual(trustChains[0]?.[1], claims[1])
-    assert.deepStrictEqual(trustChains[0]?.[2], claims[2])
+    assert.deepStrictEqual(trustChains[0]?.[0], configurations[0]?.claims)
+    assert.deepStrictEqual(trustChains[0]?.[1], configurations[1]?.claims)
+    assert.deepStrictEqual(trustChains[0]?.[2], configurations[2]?.claims)
 
-    for (const scope of scopes) {
+    for (const scope of nockScopes) {
       scope.done()
     }
   })
@@ -99,10 +74,7 @@ describe('fetch entity configuration chains', () => {
     const trustAnchorEntityId = 'https://trust.example.org'
     const superiorTrustAnchorEntityId = 'https://trust.superior.example.org'
 
-    const scopes: Array<nock.Scope> = []
-    const claims: Array<EntityConfigurationClaimsOptions> = []
-
-    const configurations = await setupConfigurationChain(
+    const { chainData: configurations, nockScopes } = await setupConfigurationChain(
       [
         { entityId: leafEntityId, authorityHints: [trustAnchorEntityId] },
         {
@@ -111,17 +83,8 @@ describe('fetch entity configuration chains', () => {
         },
         { entityId: superiorTrustAnchorEntityId },
       ],
-      signJwtCallback
+      { signJwtCallback, mockEndpoints: true }
     )
-
-    for (const { entityId, jwt, claims: configurationClaims } of configurations) {
-      const scope = nock(entityId).get('/.well-known/openid-federation').reply(200, jwt, {
-        'content-type': 'application/entity-statement+jwt',
-      })
-
-      scopes.push(scope)
-      claims.push(configurationClaims)
-    }
 
     const trustChains = await fetchEntityConfigurationChains({
       verifyJwtCallback,
@@ -132,10 +95,10 @@ describe('fetch entity configuration chains', () => {
     assert.strictEqual(trustChains.length, 1)
     assert.strictEqual(trustChains[0]?.length, 2)
 
-    assert.deepStrictEqual(trustChains[0]?.[0], claims[0])
-    assert.deepStrictEqual(trustChains[0]?.[1], claims[1])
+    assert.deepStrictEqual(trustChains[0]?.[0], configurations[0]?.claims)
+    assert.deepStrictEqual(trustChains[0]?.[1], configurations[1]?.claims)
 
-    for (const scope of scopes) {
+    for (const scope of nockScopes) {
       scope.done()
     }
   })
@@ -147,10 +110,7 @@ describe('fetch entity configuration chains', () => {
     const trustAnchorOneEntityId = 'https://trust.one.example.org'
     const trustAnchorTwoEntityId = 'https://trust.two.example.org'
 
-    const scopes: Array<nock.Scope> = []
-    const claims: Array<EntityConfigurationClaimsOptions> = []
-
-    const configurations = await setupConfigurationChain(
+    const { nockScopes } = await setupConfigurationChain(
       [
         {
           entityId: leafEntityId,
@@ -167,17 +127,8 @@ describe('fetch entity configuration chains', () => {
         { entityId: trustAnchorOneEntityId },
         { entityId: trustAnchorTwoEntityId },
       ],
-      signJwtCallback
+      { signJwtCallback, mockEndpoints: true }
     )
-
-    for (const { entityId, jwt, claims: configurationClaims } of configurations) {
-      const scope = nock(entityId).get('/.well-known/openid-federation').reply(200, jwt, {
-        'content-type': 'application/entity-statement+jwt',
-      })
-
-      scopes.push(scope)
-      claims.push(configurationClaims)
-    }
 
     const trustChains = await fetchEntityConfigurationChains({
       verifyJwtCallback,
@@ -189,7 +140,7 @@ describe('fetch entity configuration chains', () => {
     assert.strictEqual(trustChains[0]?.length, 3)
     assert.strictEqual(trustChains[1]?.length, 3)
 
-    for (const scope of scopes) {
+    for (const scope of nockScopes) {
       scope.done()
     }
   })
@@ -201,10 +152,7 @@ describe('fetch entity configuration chains', () => {
     const trustAnchorOneEntityId = 'https://trust.one.example.org'
     const trustAnchorTwoEntityId = 'https://trust.two.example.org'
 
-    const scopes: Array<nock.Scope> = []
-    const claims: Array<EntityConfigurationClaimsOptions> = []
-
-    const configurations = await setupConfigurationChain(
+    const { nockScopes } = await setupConfigurationChain(
       [
         {
           entityId: leafEntityId,
@@ -221,17 +169,8 @@ describe('fetch entity configuration chains', () => {
         { entityId: trustAnchorOneEntityId },
         { entityId: trustAnchorTwoEntityId },
       ],
-      signJwtCallback
+      { signJwtCallback, mockEndpoints: true }
     )
-
-    for (const { entityId, jwt, claims: configurationClaims } of configurations) {
-      const scope = nock(entityId).get('/.well-known/openid-federation').reply(200, jwt, {
-        'content-type': 'application/entity-statement+jwt',
-      })
-
-      scopes.push(scope)
-      claims.push(configurationClaims)
-    }
 
     const trustChains = await fetchEntityConfigurationChains({
       verifyJwtCallback,
@@ -242,23 +181,19 @@ describe('fetch entity configuration chains', () => {
     assert.strictEqual(trustChains.length, 1)
     assert.strictEqual(trustChains[0]?.length, 3)
 
-    for (const scope of scopes) {
+    for (const scope of nockScopes) {
       scope.done()
     }
   })
 
   it('should not fetch an entity configuration chain when no authority_hints are found', async () => {
-    const scopes: Array<nock.Scope> = []
-
-    const configurations = await setupConfigurationChain([{ entityId: 'https://leaf.example.org' }], signJwtCallback)
-
-    for (const { entityId, jwt } of configurations) {
-      const scope = nock(entityId).get('/.well-known/openid-federation').reply(200, jwt, {
-        'content-type': 'application/entity-statement+jwt',
-      })
-
-      scopes.push(scope)
-    }
+    const { chainData: configurations, nockScopes } = await setupConfigurationChain(
+      [{ entityId: 'https://leaf.example.org' }],
+      {
+        signJwtCallback,
+        mockEndpoints: true,
+      }
+    )
 
     const trustChains = await fetchEntityConfigurationChains({
       verifyJwtCallback,
@@ -268,20 +203,18 @@ describe('fetch entity configuration chains', () => {
 
     assert.strictEqual(trustChains.length, 0)
 
-    for (const scope of scopes) {
+    for (const scope of nockScopes) {
       scope.done()
     }
   })
 
   it('should not fetch an entity configuration chain when a loop is found', async () => {
-    const scopes: Array<nock.Scope> = []
-
     const leafEntityId = 'https://leaf.example.org'
     const intermediateOneEntityId = 'https://intermediate.one.example.org'
     const intermediateTwoEntityId = 'https://intermediate.two.example.org'
     const trustAnchorEntityId = 'https://trust.example.org'
 
-    const configurations = await setupConfigurationChain(
+    const { chainData: configurations, nockScopes } = await setupConfigurationChain(
       [
         { entityId: leafEntityId, authorityHints: [intermediateOneEntityId] },
         {
@@ -293,16 +226,8 @@ describe('fetch entity configuration chains', () => {
           authorityHints: [intermediateOneEntityId],
         },
       ],
-      signJwtCallback
+      { signJwtCallback, mockEndpoints: true }
     )
-
-    for (const { entityId, jwt } of configurations) {
-      const scope = nock(entityId).get('/.well-known/openid-federation').reply(200, jwt, {
-        'content-type': 'application/entity-statement+jwt',
-      })
-
-      scopes.push(scope)
-    }
 
     const trustChains = await fetchEntityConfigurationChains({
       verifyJwtCallback,
@@ -312,7 +237,7 @@ describe('fetch entity configuration chains', () => {
 
     assert.strictEqual(trustChains.length, 0)
 
-    for (const scope of scopes) {
+    for (const scope of nockScopes) {
       scope.done()
     }
   })

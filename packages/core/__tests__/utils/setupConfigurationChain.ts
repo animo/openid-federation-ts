@@ -1,43 +1,75 @@
+import nock from 'nock'
 import {
   type EntityConfigurationClaimsOptions,
   type EntityConfigurationHeaderOptions,
   createEntityConfiguration,
 } from '../../src/entityConfiguration'
-import { createEntityStatement } from '../../src/entityStatement'
+import { type EntityStatementClaimsOptions, createEntityStatement } from '../../src/entityStatement'
 import type { JsonWebKeySetOptions } from '../../src/jsonWeb'
 import type { SignCallback } from '../../src/utils'
 
-type SetupConfigurationChainOptions = {
+type SubordinateOptions = {
+  entityId: string
+  claims: Partial<EntityStatementClaimsOptions>
+}
+
+type ChainConfigurationOptions = {
   entityId: string
   authorityHints?: Array<string>
-  subordinates?: Array<string>
+  subordinates?: Array<string | SubordinateOptions>
   jwks?: JsonWebKeySetOptions
   kid?: string
   includeSourceEndpoint?: boolean
+
+  claims?: Partial<EntityConfigurationClaimsOptions>
 }
 
-export const setupConfigurationChain = async (
-  options: Array<SetupConfigurationChainOptions>,
-  signJwtCallback: SignCallback
+export const setupConfigurationChain = async <MockEndpoints extends boolean>(
+  chainOptions: Array<ChainConfigurationOptions>,
+  {
+    signJwtCallback,
+    mockEndpoints = false as MockEndpoints,
+  }: {
+    signJwtCallback: SignCallback
+    /**
+     * @default false
+     */
+    mockEndpoints?: MockEndpoints
+  }
 ) => {
+  if (mockEndpoints) {
+    nock.cleanAll()
+  }
+
   const chainData: Array<{
     claims: EntityConfigurationClaimsOptions
     jwt: string
     entityId: string
-    subordinateStatements?: Array<{ entityId: string; jwt: string }>
+    subordinateStatements?: Array<{ entityId: string; jwt: string; claims: EntityStatementClaimsOptions }>
   }> = []
-  for (const { entityId, authorityHints, jwks, kid, subordinates, includeSourceEndpoint = true } of options) {
+  const nockScopes: Array<nock.Scope> = []
+  for (const {
+    entityId,
+    authorityHints,
+    jwks,
+    kid,
+    subordinates,
+    includeSourceEndpoint = true,
+    claims: givenClaims = {},
+  } of chainOptions) {
     const claims: EntityConfigurationClaimsOptions = {
       iss: entityId,
       sub: entityId,
-      exp: new Date(),
+      exp: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
       iat: new Date(),
       jwks: jwks ?? { keys: [{ kid: 'a', kty: 'EC' }] },
       authority_hints: authorityHints,
+      ...givenClaims,
       metadata: {
         federation_entity: {
           federation_fetch_endpoint: `${entityId}/fetch`,
         },
+        ...(givenClaims.metadata ?? {}),
       },
     }
 
@@ -56,21 +88,51 @@ export const setupConfigurationChain = async (
       signJwtCallback,
     })
 
-    const subordinateStatements = []
+    if (mockEndpoints) {
+      const scope = nock(entityId).get('/.well-known/openid-federation').reply(200, jwt, {
+        'content-type': 'application/entity-statement+jwt',
+      })
+
+      nockScopes.push(scope)
+    }
+
+    const subordinateStatements: Array<{ entityId: string; jwt: string; claims: EntityStatementClaimsOptions }> = []
     for (const sub of subordinates ?? []) {
+      const givenClaims = typeof sub === 'string' ? { sub } : { sub: sub.entityId, ...sub.claims }
+
+      const subordinateClaims = {
+        jwks: { keys: [] },
+        iss: entityId,
+        exp: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
+        iat: new Date(),
+        ...givenClaims,
+      }
+
       const entityStatementJwt = await createEntityStatement({
         signJwtCallback,
         jwk: claims.jwks.keys[0]!,
-        claims: {
-          jwks: { keys: [] },
-          iss: entityId,
-          sub,
-          exp: new Date(),
-          iat: new Date(),
-        },
+        claims: subordinateClaims,
       })
 
-      subordinateStatements.push({ entityId: sub, jwt: entityStatementJwt })
+      if (mockEndpoints && claims.metadata?.federation_entity?.federation_fetch_endpoint) {
+        const scope = nock(claims.metadata.federation_entity.federation_fetch_endpoint)
+          .get('')
+          .query({
+            sub: subordinateClaims.sub,
+            iss: entityId,
+          })
+          .reply(200, entityStatementJwt, {
+            'content-type': 'application/entity-statement+jwt',
+          })
+
+        nockScopes.push(scope)
+      }
+
+      subordinateStatements.push({
+        entityId: subordinateClaims.sub,
+        jwt: entityStatementJwt,
+        claims: subordinateClaims,
+      })
     }
 
     chainData.push({
@@ -81,5 +143,8 @@ export const setupConfigurationChain = async (
     })
   }
 
-  return chainData
+  return {
+    chainData,
+    nockScopes: (mockEndpoints ? nockScopes : undefined) as MockEndpoints extends true ? typeof nockScopes : never,
+  } as const
 }

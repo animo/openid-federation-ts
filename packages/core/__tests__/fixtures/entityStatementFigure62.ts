@@ -1,28 +1,29 @@
 export const entityStatementFigure62 = {
   exp: 1568397247,
   iat: 1568310847,
-  iss: 'https://edugain.geant.org',
-  sub: 'https://swamid.se',
-  source_endpoint: 'https://edugain.geant.org/edugain/api',
+  iss: 'https://swamid.se',
+  sub: 'https://umu.se',
+  source_endpoint: 'https://swamid.se/fedapi',
   jwks: {
     keys: [
       {
         e: 'AQAB',
-        kid: 'N1pQTzFxUXZ1RXVsUkVuMG5uMnVDSURGRVdhUzdO...',
+        kid: 'endwNUZrNTJsX2NyQlp4bjhVcTFTTVltR2gxV2RV...',
         kty: 'RSA',
-        n: '3EQc6cR_GSBq9km9-WCHY_lWJZWkcn0M05TGtH6D9S...',
+        n: 'vXdXzZwQo0hxRSmZEcDIsnpg-CMEkor50SOG-1XUlM...',
       },
     ],
   },
   metadata_policy: {
     openid_provider: {
-      contacts: {
-        add: 'ops@edugain.geant.org',
+      id_token_signing_alg_values_supported: {
+        subset_of: ['RS256', 'ES256', 'ES384', 'ES512'],
       },
-    },
-    openid_relying_party: {
-      contacts: {
-        add: 'ops@edugain.geant.org',
+      token_endpoint_auth_methods_supported: {
+        subset_of: ['client_secret_jwt', 'private_key_jwt'],
+      },
+      userinfo_signing_alg_values_supported: {
+        subset_of: ['ES256', 'ES384', 'ES512'],
       },
     },
   },

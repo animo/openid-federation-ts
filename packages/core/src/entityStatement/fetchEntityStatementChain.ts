@@ -1,6 +1,6 @@
 import type { EntityConfigurationClaims } from '../entityConfiguration'
-import { ErrorCode } from '../error/ErrorCode'
 import { OpenIdFederationError } from '../error/OpenIdFederationError'
+import { PolicyErrorStage } from '../error/PolicyErrorStage'
 import type { VerifyCallback } from '../utils'
 import type { EntityStatementClaims } from './entityStatementClaims'
 import { fetchEntityStatement } from './fetchEntityStatement'
@@ -10,13 +10,15 @@ export type FetchEntityStatementChainOptions = {
   verifyJwtCallback: VerifyCallback
 }
 
+export type EntityStatementChain = Array<EntityStatementClaims>
+
 export const fetchEntityStatementChain = async ({
   verifyJwtCallback,
   entityConfigurations,
-}: FetchEntityStatementChainOptions): Promise<Array<EntityStatementClaims>> => {
+}: FetchEntityStatementChainOptions): Promise<EntityStatementChain> => {
   if (entityConfigurations.length === 0) {
     throw new OpenIdFederationError(
-      ErrorCode.Validation,
+      PolicyErrorStage.Validation,
       'Cannot establish a statement chain for zero entity configurations'
     )
   }
@@ -41,7 +43,7 @@ export const fetchEntityStatementChain = async ({
 
     if (!fetchEndpoint) {
       throw new OpenIdFederationError(
-        ErrorCode.Validation,
+        PolicyErrorStage.Validation,
         `No fetch endpoint found for configuration for: '${configuration?.sub}'`
       )
     }
@@ -62,7 +64,7 @@ export const fetchEntityStatementChain = async ({
   const trustAnchorEntityConfiguration = entityConfigurations[entityConfigurations.length - 1]
   // Should never happen because there will always be a trust anchor in a valid chain
   if (!trustAnchorEntityConfiguration) {
-    throw new OpenIdFederationError(ErrorCode.Validation, 'No trust anchor entity configuration found')
+    throw new OpenIdFederationError(PolicyErrorStage.Validation, 'No trust anchor entity configuration found')
   }
 
   return [trustAnchorEntityConfiguration, ...(await Promise.all(promises))].reverse()
